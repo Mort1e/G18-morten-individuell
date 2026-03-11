@@ -1,0 +1,912 @@
+**Abstract**
+
+**Proposal LOG650 -- Forskningsprosjekt**
+
+**Student:** Morten Eidsvåg\
+**Arbeidsform:** Individuelt
+
+Dette prosjektet gjennomføres individuelt. Valget begrunnes med at
+prosjektet tar utgangspunkt i problemstillinger og datagrunnlag fra
+virksomheten studenten arbeider i, samt god kjennskap til organisasjonen
+og de logistikkfaglige utfordringene som analyseres. Videre har jeg
+tilgang til relevante fagpersoner i virksomheten, herunder Head of
+Supply Chain og salgssjef, som kan bidra med faglige avklaringer knyttet
+til datagrunnlaget ved behov.
+
+**Område:**
+
+Etterspørselsprognoser -- Hva blir salget neste måned? -- Predikere
+fremtidigetterspørsel basert på historiske data, trender og
+sesongvariasjoner.
+
+**Problemstilling**
+
+Den overordnede problemstillingen i prosjektet er:
+
+**Gir ARIMA bedre prediksjon av månedlig etterspørsel enn Holt--Winters
+når metodene anvendes på reelle salgsdata?**
+
+Problemstillingen kan bli justert og presisert i prosjektets tidlige
+fase i forbindelse med videre metodisk avklaring.
+
+**Bedrift - Anonymisert**
+
+Prosjektet tar utgangspunkt i et legemiddelfirma som leverer varer fra
+et europeisk sentrallager til flere grossister i Norge. Bedriftens navn
+og produkter er anonymisert for å sikre tilgang til reelle data og for å
+ivareta konfidensialitet.
+
+**Datagrunnlag**
+
+Datagrunnlaget består av anonymiserte, månedlige volumdata for 105
+varelinjer over en periode på 36 måneder. Tallene representerer antall
+pakninger levert fra sentrallager til grossister og gir et realistisk
+bilde av faktisk logistisk etterspørsel.
+
+Virksomheten har strenge retningslinjer for bruk av data i KI-verktøy og
+språkmodeller. Alle data som benyttes i prosjektet er derfor anonymisert
+og brukes utelukkende til analyseformål innenfor rammen av dette
+studiet.
+
+Datamaterialet vurderes som tilstrekkelig omfattende til å analysere
+både trend- og sesongvariasjoner, og egner seg for sammenligning av
+ulike prognosemetoder.
+
+**Metodisk tilnærming**
+
+**Naiv prognose som referansepunkt**
+
+Den naive prognosen benyttes som referansepunkt for evaluering av mer
+avanserte prognosemetoder. Formålet er ikke høy presisjon, men å
+etablere et minimumsnivå som andre modeller forventes å forbedre. Dersom
+en mer kompleks metode ikke gir bedre resultater enn den naive
+prognosen, vil det være vanskelig å forsvare bruken av den i praksis.
+
+**Holt--Winters som hovedmetode**
+
+Holt--Winters-metoden er valgt som hovedreferanse i prosjektet. Metoden
+er mye brukt i praksis for månedlige salgstall og er særlig godt egnet
+når etterspørselen viser både trend og sesongmønstre. I det analyserte
+datagrunnlaget forekommer det ingen kampanjer, men det forventes
+varierende grad av sesongvariasjon mellom ulike varelinjer.
+
+**ARIMA som alternativ metode**
+
+ARIMA er vurdert som en alternativ prognosemetode. Metoden er mindre
+intuitiv og krever ofte mer modelltilpasning og testing, men kan være
+relevant for sammenligningsformål og metodisk læring i faget. Det vil
+bli vurdert om en sesongtilpasset ARIMA-modell er hensiktsmessig gitt
+datagrunnlagets egenskaper.
+
+**XGBoost som sammenligningsmetode**
+
+Som et supplement til de klassiske tidsseriemodellene vurderes også bruk
+av **XGBoost (Extreme Gradient Boosting)**, som representerer en moderne
+maskinlæringsmetode. I motsetning til Holt--Winters og ARIMA, som
+modellerer tidsseriens struktur direkte, lærer XGBoost mønstre i data
+basert på konstruerte variabler som tidligere etterspørsel
+(lag-variabler), trend og sesongindikatorer. Metoden har vist gode
+resultater i nyere studier av etterspørselsprognoser fordi den kan
+håndtere ikke-lineære sammenhenger og utnytte informasjon på tvers av
+flere produkter. I dette prosjektet brukes XGBoost primært som et
+sammenligningsgrunnlag for å vurdere om en mer avansert KI-basert metode
+gir bedre prognosepresisjon enn de klassiske modellene.
+
+**Prognoser brukt i virksomheten**
+
+Der det er mulig, vil prosjektets prognoser sammenlignes med prognoser
+som benyttes i virksomheten. Selv om studenten ikke har direkte tilgang
+til virksomhetens prognosesystemer, vil fagpersoner i bedriften kunne
+bidra med nødvendig innsikt for en overordnet sammenligning.
+
+**Målfunksjon og evaluering**
+
+Alle prognosemetodene vurderes ved hjelp av et felles
+evalueringsopplegg, med identiske datasett og prognosehorisonter. Valg
+av feilmål vil bli endelig fastsatt i forbindelse med videre
+metodearbeid, men aktuelle mål er blant annet RMSE og MAPE.
+
+Metodene evalueres på samme historiske datagrunnlag og samme
+prognoseperiode. Det anses som fullt akseptabelt at mer avanserte
+metoder gir marginal forbedring eller tilsvarende presisjon sammenlignet
+med enklere modeller. Økt modellkompleksitet gir ikke nødvendigvis økt
+praktisk nytte, og dette vil bli diskutert i prosjektet.
+
+**Avgrensninger**
+
+Oppgaven avgrenses til analyse av anonymiserte, månedlige volumdata for
+utvalgte varelinjer levert fra sentrallager til grossister over en
+periode på 36 måneder. Analysen fokuserer på kortsiktige
+etterspørselsprognoser ved bruk av naive prognoser og Holt--Winters som
+hovedmetode, supplert med én KI-basert metode som
+sammenligningsgrunnlag.
+
+Oppgaven inkluderer ikke prisdata, kampanjer eller sluttkundesalg.
+
+**Bruk av KI i arbeidet**
+
+Dette proposalet er utarbeidet med utgangspunkt i teori fra kompendiet i
+LOG650, *Kvantitative metoder i logistikk -- implementert via KI*.
+KI-verktøy, herunder ChatGPT og Claude CLI, er brukt som støtte for å
+vurdere datagrunnlaget opp mot relevant teori og for å utforske
+alternative løsningsforslag. Valg av metode og endelig utforming av
+prosjektet er gjort av studenten basert på faglig vurdering og teori
+gjennomgått i emnet.
+
+Innhold
+
+[1.0 Innledning [1](#innledning)](#innledning)
+
+[1.1 Problemstilling [2](#problemstilling)](#problemstilling)
+
+[1.2 Delproblemer (valgfri) [2](#_Toc222057405)](#_Toc222057405)
+
+[1.3 Avgrensinger [2](#avgrensinger)](#avgrensinger)
+
+[1.4 Antagelser [3](#antagelser)](#antagelser)
+
+[2.0 Litteratur [3](#litteratur)](#litteratur)
+
+[3.0 Teori [3](#teori)](#teori)
+
+[4.0 Casebeskrivelse [4](#casebeskrivelse)](#casebeskrivelse)
+
+[5.0 Metode og data (kan splittes i to)
+[4](#_Toc222057411)](#_Toc222057411)
+
+[5.1 Metode [4](#metode-vent-med-denne)](#metode-vent-med-denne)
+
+[5.2 Data [5](#data)](#data)
+
+[6.0 Modellering [6](#modellering)](#modellering)
+
+[7.0 Analyse [6](#_Toc222057415)](#_Toc222057415)
+
+[8.0 Resultat [6](#_Toc222057416)](#_Toc222057416)
+
+[9.0 Diskusjon [7](#_Toc222057417)](#_Toc222057417)
+
+[10.0 Konklusjon [8](#_Toc222057418)](#_Toc222057418)
+
+[11.0 Bibliografi [8](#bibliografi)](#bibliografi)
+
+## 
+
+[Vedlegg [8](#vedlegg)](#vedlegg)
+
+# 1.0 Innledning {#innledning .unnumbered}
+
+Etterspørselsprognoser er sentrale i beslutningsprosessene innen
+logistikk og supply chain management. Prognoser danner grunnlaget for
+planlegging av produksjon, lagerbeholdning og distribusjon i
+forsyningskjeder (Hyndman & Athanasopoulos, 2021). Den farmasøytiske
+sektoren kjennetegnes av sesongvariasjoner, regulatoriske krav og høye
+krav til leveringspålitelighet. I Norge har man gjennom flere tiår
+bygget ned nasjonale beredskapslagre for legemidler. Tidligere hadde
+staten et mer direkte ansvar for beredskapslager gjennom Norsk
+Medisinaldepot (NMD). Etter innføringen av apotekloven 1. mars 2001 så
+ble dette i noen grad erstattet med minstekrav til leveringsgrad for
+legemidler (Lov om apotek §5-4).
+
+Til tross for dette har Norge opplevd flere tilfeller av
+legemiddelmangel de senere årene. Slike mangelsituasjoner kan skyldes
+både globale forsyningsproblemer og mangelfulle etterspørselsprognoser.
+Feilprognoser kan føre til enten legemiddelmangel, med potensielle
+helsemessige konsekvenser, eller overlagring som gir økte kostnader og
+risiko for tapt salg.
+
+Tradisjonelt har etterspørselsprognoser vært basert på statistiske
+tidsseriemodeller som eksponentiell glatting og ARIMA (Hyndman &
+Athanasopoulos, 2021). Eksponentiell glatting, inkludert
+Holt--Winters-metoden, er spesielt utviklet for tidsserier som
+inneholder både trend og sesongmønstre, og er derfor mye brukt i
+operativ etterspørselsplanlegging (Hyndman & Athanasopoulos, 2021).
+Innen farmasøytisk industri viser studier at Holt--Winters ofte gir
+tilfredsstillende prognosenøyaktighet når dataserier inneholder tydelige
+sesongkomponenter (Burinskiene, 2022).
+
+Nyere forskning indikerer imidlertid at maskinlæringsmetoder kan
+håndtere mer komplekse og ikke-lineære mønstre i data. Spesielt har
+gradient boosting-metoder som XGBoost vist gode resultater i
+prognoseoppgaver hvor tradisjonelle modeller ikke fanger opp komplekse
+sammenhenger (Chen & Guestrin, 2016; Fourkiotis & Tsadiras, 2024).
+
+Litteraturgjennomgangen viser derfor et metodisk spenn mellom klassiske
+statistiske modeller og nyere maskinlæringsmetoder. Samtidig er det
+fortsatt uklart i hvilken grad mer komplekse AI-modeller faktisk gir
+merverdi i situasjoner med begrenset historikk og panelstruktur på
+produktnivå, slik mange distribusjonsbedrifter opererer med i praksis.
+
+Denne rapporten undersøker derfor hvordan ulike prognosemodeller
+presterer på reelle distribusjonsdata fra et sentrallager til
+grossister, bestående av 105 varelinjer over en periode på 48 måneder.
+Studien søker å bidra med innsikt i hvilken modelltype som gir best
+balanse mellom prognosepresisjon, robusthet og operasjonell anvendbarhet
+i logistikkplanlegging.
+
+## Problemstilling
+
+Med utgangspunkt i ovenstående aktualisering formuleres følgende
+problemstilling:
+
+**Hvilken prognosemodell gir høyest prediksjonsnøyaktighet for månedlige
+leveranser av farmasøytiske varelinjer i et
+sentrallager--grossist-system, gitt et datasett på 36 måneder og 105
+produkter?**
+
+For å besvare problemstillingen sammenlignes tre prognosemodeller:
+
+> Holt--Winters eksponentiell glatting
+>
+> ARIMA
+>
+> XGBoost
+
+Modellene evalueres ved hjelp av etablerte prognosenøyaktighetsmål som
+**RMSE, MAE og MAPE**, som er blant de mest brukte målene for å evaluere
+prognosemodeller i tidsserieanalyse (Hyndman & Athanasopoulos, 2021).
+
+Analysen søker ikke bare å identifisere hvilken modell som gir best
+prognosepresisjon, men også å diskutere hvorvidt økt modellkompleksitet
+gir reell merverdi i et praktisk planleggingsperspektiv.
+
+## Avgrensinger
+
+Oppgavens natur og tilgang på data gjør det nødvendig at det For å sikre
+analytisk presisjon gjøres følgende avgrensninger:
+
+Datasett: Studien benytter kun historiske leveransedata (månedlig
+volum). Eksterne forklaringsvariabler som pris, kampanjer, demografi
+eller regulatoriske utfordringer inkluderes ikke.
+
+Tidsperiode: Analysen omfatter 36 måneder. Lengre historikk er ikke
+tilgjengelig og vurderes derfor ikke.
+
+Horisont: Fokus er på kort- til mellomlangsiktig prognose relevant for
+lager- og produksjonsplanlegging.
+
+Modellutvalg: Kun utvalgte representative modeller innen klassisk og
+nyere tidsserieanalyse er vurdert i denne oppgaven.
+
+Struktur: Prognoser utvikles på varelinjenivå.
+
+Disse avgrensningene gjør det mulig å analysere modellenes prestasjon
+under realistiske betingelser, samtidig som metodisk nøyaktighet
+opprettholdes.
+
+## Antagelser
+
+For å sikre at analysen blir pålitelig må det gjøres følgende antagelser
+om dataene og metodene som analyseres. Antagelsene tydeliggjør
+forutsetningene som ligger i modellene og avgrenser samtidig tolkningen
+av resultatene. I tidsserieanalyse er slike forutsetninger nødvendige
+fordi prognosemodeller bygger på at historiske observasjoner inneholder
+informasjon som kan brukes til å predikere fremtidige verdier (Hyndman &
+Athanasopoulos, 2021).
+
+Antagelse 1: Leveranser reflekterer virkelig etterspørsel
+
+Det antas at månedlige leveranser fra sentrallager til grossister i
+hovedsak reflekterer faktisk etterspørsel, og at leveransene ikke
+systematisk påvirkes av hamstring, kampanjer eller regulatoriske
+forhold. Siden analysen baseres på leveranser til grossister og ikke
+sluttkundesalg, kan bullwhip-effekter føre til at variasjoner i
+etterspørselen forsterkes gjennom distribusjonsleddene. Dette kan
+innebære at modellene i noen tilfeller fanger opp variasjoner i
+bestillingsatferd snarere enn reell sluttkundedemand.
+
+Antagelse 2: Stabile data i tid
+
+Trend- og sesongkomponenter antas å være relativt stabile i
+analyseperioden på 36 måneder. Både klassiske tidsseriemodeller som
+Holt--Winters og ARIMA bygger på antagelsen om at historiske mønstre i
+dataene inneholder informasjon om fremtidige observasjoner (Hyndman &
+Athanasopoulos, 2021). Dersom dataserien inneholder strukturelle brudd
+eller større regimeendringer, kan dette redusere modellens prognoseevne.
+
+Antagelse 3: Uavhengige varelinjer
+
+Hver varelinje modelleres uavhengig av øvrige produkter.
+Krysselastisiteter og substitusjonseffekter mellom produkter inngår
+derfor ikke eksplisitt i analysen. Dette innebærer at hver tidsserie
+analyseres separat, noe som er vanlig praksis i klassisk
+tidsserieprognostisering når produktene har egne etterspørselsmønstre
+(Hyndman & Athanasopoulos, 2021).
+
+Antagelse 4: Eksterne faktorer reflekteres i historikken
+
+Effekter av prisendringer, kampanjer eller regulatoriske forhold antas å
+være implisitt representert i de historiske observasjonene. Dette er en
+nødvendig antagelse ettersom modellene som benyttes i studien primært er
+basert på univariate tidsserier uten eksterne forklaringsvariabler.
+
+Antagelse 5: Ingen systematiske prognosefeil
+
+Det antas at avvikene i modellene ikke inneholder vedvarende systematisk
+over- eller underestimering. En slik antagelse er nødvendig for at
+prognosemål som RMSE, MAE og MAPE skal gi en meningsfull sammenligning
+av modellene, ettersom disse målene brukes til å evaluere
+prognosepresisjon i tidsserieanalyse (Hyndman & Athanasopoulos, 2021).
+
+Samlet konsekvens
+
+Antagelsene innebærer at studiens resultater primært gjelder stabile
+distribusjonssystemer uten større strukturelle brudd. Dersom markedet
+påvirkes av betydelige eksterne endringer eller uforutsigbare hendelser,
+kan modellens prognosenøyaktighet bli redusert.
+
+# Litteratur
+
+Etterspørselsprognoser er et sentralt forskningsområde innen logistikk
+og supply chain management, ettersom prognosenøyaktighet påvirker
+beslutninger knyttet til lagerstyring, produksjonsplanlegging og
+distribusjon. I farmasøytisk sektor er dette særlig viktig, ettersom
+feilprognoser kan føre til både legemiddelmangel og økt kapitalbinding i
+lager. De siste årene har forskningen i økende grad fokusert på
+sammenligning mellom tradisjonelle tidsseriemodeller og nyere
+maskinlæringsmetoder, med mål om å forbedre prognosenøyaktigheten i
+komplekse etterspørselssystemer.
+
+Tradisjonelle statistiske modeller, særlig eksponentiell glatting og
+ARIMA-modeller, har lenge vært standardmetoder for operativ
+etterspørselsplanlegging. Disse metodene er godt etablert i litteraturen
+og er kjent for å være relativt robuste når dataserier viser stabile
+trend- og sesongmønstre (Hyndman & Athanasopoulos, 2018).
+Holt--Winters-metoden, som er en videreføring av eksponentiell glatting,
+er spesielt utviklet for tidsserier med både trend og sesongkomponenter
+og brukes derfor ofte i praktisk salgs- og lagerprognostisering.
+
+Innen farmasøytisk retail viser Burinskiene (2022) at
+prognosenøyaktighet ikke bare påvirkes av valg av modell, men også av
+hvordan dataene struktureres og behandles. Studien analyserer prognoser
+for legemiddelprodukter på apoteknivå og viser at prognoser utviklet på
+et mer detaljert nivå kan gi bedre presisjon enn prognoser basert på mer
+aggregerte data. Studien fremhever også betydningen av datakvalitet,
+blant annet gjennom håndtering av outliers og perioder med mangel på
+varer. Disse funnene indikerer at kvaliteten på datagrunnlaget og nivået
+prognosen utvikles på kan være like viktig som selve modellvalget.
+
+Parallelt med denne forskningen har det de siste årene vært økende
+interesse for maskinlæringsbaserte metoder innen etterspørselsprognoser.
+Slike metoder har potensial til å fange mer komplekse og ikke-lineære
+sammenhenger i data enn tradisjonelle statistiske modeller. Fourkiotis
+og Tsadiras (2024) sammenligner flere statistiske modeller og
+maskinlæringsmetoder på farmasøytiske salgsdata og finner at gradient
+boosting-metoder, særlig XGBoost, ofte gir lavere prognosefeil enn
+tradisjonelle modeller. Samtidig viser resultatene at enklere
+statistiske modeller i enkelte tilfeller kan prestere like godt når
+tidsseriene har tydelige sesongmønstre. Dette indikerer at modellvalg
+bør tilpasses datagrunnlagets egenskaper, og at økt modellkompleksitet
+ikke nødvendigvis gir bedre prognoser.
+
+Andre studier peker på at maskinlæringsmetoder kan være særlig nyttige
+når datastrukturen er mer kompleks, for eksempel når etterspørselen
+påvirkes av flere produkter eller ulike nivåer i forsyningskjeden. Zhu
+et al. (2021) viser at maskinlæringsmodeller kan forbedre
+prognosenøyaktigheten når informasjon fra flere relaterte tidsserier
+analyseres samlet. Samtidig understrekes det i litteraturen at slike
+modeller ofte krever større datamengder og mer omfattende
+modelltilpasning enn tradisjonelle tidsseriemodeller.
+
+Til tross for den økende interessen for maskinlæringsmetoder er det
+fortsatt usikkerhet knyttet til hvor stor praktisk merverdi disse
+metodene gir i situasjoner der datagrunnlaget er relativt begrenset.
+Mange virksomheter opererer med relativt korte tidsserier og moderate
+datamengder, noe som kan redusere fordelene ved mer komplekse modeller.
+Dette er særlig relevant i operativ logistikkplanlegging, hvor modellene
+må være både robuste og praktisk anvendbare.
+
+På bakgrunn av denne forskningen fremstår en sammenligning mellom
+klassiske tidsseriemodeller og nyere maskinlæringsmetoder som et
+relevant forskningsbidrag. Denne rapporten bygger videre på eksisterende
+litteratur ved å undersøke hvordan Holt--Winters og ARIMA presterer på
+et datasett bestående av månedlige leveranser fra et sentrallager til
+grossister. I tillegg inkluderes XGBoost som en maskinlæringsbasert
+metode for å undersøke om en mer datadrevet modell gir bedre
+prognosepresisjon enn de tradisjonelle modellene.
+
+Studien bidrar dermed til den eksisterende forskningen ved å analysere
+reelle logistikkdata fra 105 varelinjer over en periode på 36 måneder.
+Samtidig adresserer den et praktisk relevant spørsmål innen operativ
+etterspørselsplanlegging: om økt modellkompleksitet faktisk gir bedre
+prognoser i en distribusjonskontekst med relativt begrenset historisk
+datagrunnlag.
+
+# Teori
+
+Etterspørselsprognoser er en sentral del av beslutningsgrunnlaget i
+logistikk og supply chain management. Prognoser brukes til å planlegge
+lagerbeholdning, produksjon og distribusjon, og prognosenøyaktighet kan
+derfor ha direkte konsekvenser for både kostnader og servicenivå i en
+virksomhet. I praksis innebærer etterspørselsprognoser å bruke
+historiske data til å estimere fremtidig etterspørsel ved hjelp av
+statistiske eller datadrevne modeller.
+
+Innen prognoseteori er eksponentiell glatting og ARIMA blant de mest
+etablerte modellene for tidsserieprognoser. Eksponentiell glatting
+bygger på prinsippet om at nyere observasjoner bør tillegges større vekt
+enn eldre observasjoner. Holt--Winters-modellen utvider denne
+tilnærmingen ved å inkludere separate komponenter for nivå, trend og
+sesong (Hyndman & Athanasopoulos, 2021).
+
+ARIMA-modeller beskriver tidsserier gjennom autoregressive komponenter,
+differensiering og glidende gjennomsnitt. Disse modellene er spesielt
+nyttige når dataserier viser statistisk avhengighet mellom tidligere
+observasjoner og prognosefeil (Hyndman & Athanasopoulos, 2021).
+
+I nyere forskning har maskinlæringsmetoder blitt stadig mer brukt i
+prognoseoppgaver. Slike modeller kan identifisere komplekse mønstre i
+data uten å anta en bestemt statistisk struktur. Samtidig understrekes
+det i litteraturen at mer komplekse modeller ikke nødvendigvis gir bedre
+prognoser enn enklere modeller når dataseriene er korte eller relativt
+stabile (Hyndman & Athanasopoulos, 2021; Petropoulos et al., 2022)
+
+**Klassiske tidsseriemodeller**
+
+Tradisjonelle prognosemetoder innen logistikk og operasjonsanalyse er
+ofte basert på statistisk tidsserieanalyse. Slike modeller antar at
+historiske observasjoner inneholder informasjon om fremtidige verdier
+gjennom trend, sesongmønstre og autokorrelasjon. En av de mest brukte
+modellene i operativ etterspørselsplanlegging er Holt--Winters-metoden,
+som er en videreutvikling av eksponentiell glatting. Modellen
+dekomponerer tidsserien i tre komponenter: nivå, trend og sesong, og er
+derfor spesielt egnet for dataserier med stabile sesongmønstre (Hyndman
+& Athanasopoulos, 2018).
+
+En annen mye brukt metode er ARIMA-modellen (Autoregressive Integrated
+Moving Average). ARIMA beskriver tidsserien gjennom statistiske
+sammenhenger mellom tidligere observasjoner og tidligere prognosefeil.
+Modellen kan være fleksibel når tidsserien ikke viser en tydelig eller
+stabil sesongstruktur (Box et al., 2015). Flere studier innen
+etterspørselsprognoser viser at slike statistiske modeller fortsatt kan
+gi gode resultater i praktiske anvendelser, særlig når dataseriene er
+relativt korte og strukturen i dataene er stabil (Petropoulos et al.,
+2022).
+
+Innen farmasøytisk retail viser Burinskiene (2022) at
+prognosenøyaktighet påvirkes både av modellvalg og av hvordan dataene
+struktureres. Studien viser blant annet at prognoser utviklet på et mer
+detaljert nivå i distribusjonskjeden kan gi bedre presisjon enn mer
+aggregerte analyser. I tillegg fremheves betydningen av datakvalitet,
+blant annet gjennom håndtering av outliers og perioder med mangel på
+varer.
+
+**Maskinlæringsbaserte prognosemodeller**
+
+I nyere forskning har det vært økende interesse for maskinlæringsmetoder
+innen etterspørselsprognoser. Maskinlæring skiller seg fra tradisjonelle
+tidsseriemodeller ved at modellene ikke nødvendigvis forutsetter en
+bestemt statistisk struktur i dataene. I stedet lærer modellene mønstre
+direkte fra data gjennom algoritmer som optimaliserer prediksjonsfeil.
+
+En metode som har fått særlig oppmerksomhet er XGBoost (Extreme Gradient
+Boosting), som er en ensemblemetode basert på gradient boosting av
+beslutningstrær (Chen & Guestrin, 2016). Metoden er utviklet for å
+håndtere store datasett og komplekse mønstre i dataene, og har vist gode
+resultater innen en rekke prediksjonsoppgaver.
+
+Flere nyere studier har undersøkt bruken av maskinlæring i
+etterspørselsprognoser. Fourkiotis og Tsadiras (2024) sammenligner
+statistiske modeller og maskinlæringsmetoder på farmasøytiske salgsdata
+og finner at gradient boosting-metoder, særlig XGBoost, ofte gir lavere
+prognosefeil enn tradisjonelle modeller. Samtidig viser resultatene at
+enklere statistiske modeller kan prestere like godt i situasjoner der
+tidsseriene har tydelige sesongmønstre.
+
+Andre studier peker på at maskinlæringsmodeller kan være spesielt
+nyttige når datastrukturen er mer kompleks, for eksempel når
+etterspørselen påvirkes av flere produkter eller ulike nivåer i
+forsyningskjeden. Zhu et al. (2021) viser at maskinlæringsmodeller kan
+forbedre prognosenøyaktigheten når informasjon fra flere relaterte
+tidsserier analyseres samlet. Dette er særlig relevant i situasjoner der
+datamengden per produkt er begrense
+
+**Uenigheter i forskningen**
+
+Til tross for den økende interessen for maskinlæringsmetoder er det
+fortsatt uenighet i litteraturen om hvorvidt slike metoder alltid gir
+bedre prognoser enn tradisjonelle statistiske modeller. Enkelte studier
+finner at maskinlæringsmodeller gir lavere prognosefeil, mens andre
+studier viser at enklere modeller kan prestere like godt eller bedre når
+dataseriene er korte eller relativt stabile (Petropoulos et al., 2022).
+
+En viktig diskusjon i forskningen handler derfor om forholdet mellom
+modellkompleksitet og praktisk nytte. Mer avanserte modeller kan være
+vanskeligere å implementere og tolke i praksis, og økt kompleksitet gir
+ikke nødvendigvis bedre beslutningsgrunnlag i operative
+planleggingsprosesser.
+
+**Forskningsgap og plassering av studien**
+
+Til tross for omfattende forskning på etterspørselsprognoser er det
+fortsatt behov for empiriske studier som analyserer prognosemetoder på
+reelle logistikkdata. Mange studier er basert på offentlige datasett
+eller simulert data, mens færre studier undersøker hvordan ulike
+modeller presterer i konkrete distribusjonskontekster.
+
+Denne studien bidrar til litteraturen ved å analysere prognosemetoder på
+et datasett bestående av månedlige leveranser fra et sentrallager til
+grossister. Datasettet omfatter 105 varelinjer over en periode på 36
+måneder og representerer derfor et realistisk beslutningsgrunnlag i
+operativ logistikkplanlegging.
+
+Studien undersøker spesielt hvorvidt ARIMA gir bedre prognosepresisjon
+enn Holt--Winters, samt om en maskinlæringsbasert metode som XGBoost kan
+gi ytterligere forbedringer. Dermed belyser studien et praktisk relevant
+spørsmål innen etterspørselsprognoser: om mer avanserte modeller faktisk
+gir bedre prediksjoner enn tradisjonelle statistiske metoder i en
+logistikkontekst med relativt begrenset historisk datagrunnlag.
+
+# Casebeskrivelse
+
+**Bakgrunn for problemstillingen**
+
+Studien tar utgangspunkt i en farmasøytisk virksomhet som distribuerer
+legemidler fra et europeisk sentrallager til flere grossister i Norge.
+Virksomheten opererer i en bransje hvor høy leveringspålitelighet er
+avgjørende, ettersom legemidler ofte er kritiske produkter hvor mangel
+kan få direkte konsekvenser for både pasienter og helsevesen. Samtidig
+er det viktig å unngå unødvendig lagerbinding og svinn, særlig fordi
+enkelte legemidler har begrenset holdbarhet.
+
+For å håndtere denne balansen er virksomheten avhengig av gode
+etterspørselsprognoser. Prognosene brukes blant annet til å planlegge
+lagerbeholdning i sentrallageret og til å koordinere leveranser til
+grossistene. Feilprognoser kan føre til enten for lave lagernivåer, med
+risiko for mangelsituasjoner, eller for høye lagernivåer, noe som kan gi
+økte kostnader og risiko for kassasjon.
+
+Datagrunnlaget som benyttes i denne studien består av månedlige
+leveranser fra sentrallageret til grossister i Norge. Datasettet
+omfatter 105 varelinjer over en periode på 36 måneder og representerer
+derfor et realistisk bilde av etterspørselen som virksomheten må
+planlegge for. Leveransene til grossistene fungerer i denne sammenhengen
+som et mål på etterspørselen i markedet.
+
+I dag benytter virksomheten egne interne prognoser som grunnlag for
+planlegging. Studenten har imidlertid ikke direkte tilgang til de
+interne prognosemodellene. Dette prosjektet tar derfor utgangspunkt i
+tilgjengelige historiske leveransedata for å undersøke hvordan ulike
+prognosemetoder kan brukes til å predikere fremtidig etterspørsel.
+
+En sentral utfordring i dette arbeidet er å velge en prognosemodell som
+både gir tilstrekkelig presisjon og samtidig er praktisk anvendbar i en
+operativ logistikkontekst. I litteraturen diskuteres ofte hvorvidt mer
+avanserte modeller gir bedre prognoser enn enklere statistiske metoder.
+På bakgrunn av dette undersøker studien hvordan to etablerte
+tidsseriemodeller, Holt--Winters og ARIMA, presterer på virksomhetens
+data. I tillegg vurderes en maskinlæringsbasert metode (XGBoost) for å
+analysere om en mer datadrevet modell kan gi forbedret
+prognosepresisjon.
+
+Formålet er dermed å analysere hvorvidt mer avanserte prognosemetoder
+gir bedre prediksjoner enn enklere modeller i en praktisk
+distribusjonskontekst med relativt begrenset historisk datagrunnlag.
+
+[]{#_Toc222057411 .anchor}Metode og data (kan splittes i to)
+
+Litt avhengig av omfanget, kan det være lurt å vurdere om du skal
+splitte kapittelet i to eller ikke.
+
+# Metode (Vent med denne)
+
+I oppgavens metodedel skal du beskrive valgt metode. Dette skal
+beskrives så nøyaktig at andre skal kunne klare å gjenta prosessen.
+Metodedelen gir leseren mulighet til å vurdere hvorvidt oppgaven kan
+inneholde feil i fremgangsmåten.
+
+Oppgi paradigme betraktninger, forskningsperspektiv, forskningsdesign,
+innsamlingsmetode for data, utvalgskriterier, utvalgsmetode,
+utvalgsstørrelse og analysemetoder.
+
+Du kan også ta opp eventuelle etiske spørsmål og potensielle feilkilder.
+
+Eksempel:
+
+Hvilken forskningsmetode er valgt?
+
+For de fleste er det case-metode
+
+Kvantitativ eller kvalitativ?
+
+Hva slags data (spørreskjema, intervju, fra ERP systemet)
+
+Teori rundt det å lage spørreskjema
+
+Teori rundt det med nøyaktigheten av data fra ERP system
+
+Metode for analyse, kvantitativ, kvalitativ
+
+Kort beskrivelse av den metoden som er valgt
+
+Statistisk metode? regresjon?
+
+Kort beskrivelse (bruk lærebøker)
+
+Dataverktøy for eksempel SPSS eller excel
+
+# Data
+
+Datagrunnlaget i studien består av historiske salgsdata hentet fra
+virksomhetens interne ERP-system. Dataene er anonymisert før de ble
+brukt i prosjektet for å sikre konfidensialitet knyttet til både
+produkter og virksomhet.
+
+Datasettet inneholder månedlige leveransevolumer fra et europeisk
+sentrallager til grossister i Norge. Leveransene brukes i denne studien
+som en proxy for etterspørsel i markedet.
+
+**Hvordan dataene er samlet inn**
+
+Dataene er hentet direkte fra virksomhetens ERP-system av studenten som
+arbeider i virksomheten. Uttrekket ble gjort som en eksport av
+historiske salgsdata til Excel-format. Før analysen ble datasettet
+anonymisert slik at produktidentitet og bedriftsinformasjon ikke kan
+identifiseres.
+
+Det er ikke gjennomført intervjuer eller spørreundersøkelser i
+forbindelse med datainnsamlingen. All kvantitativ analyse i studien
+baseres på historiske salgsdata.
+
+**Tidsperiode**
+
+Datasettet dekker perioden: **Januar 2022 -- desember 2025**
+
+Dette gir totalt **48 månedlige observasjoner per varelinje** i
+rådatasettet.
+
+For analyseformål vil det kunne bli brukt en noe kortere tidsperiode
+dersom enkelte serier inneholder manglende observasjoner eller dersom
+dataseriene må tilpasses modellkravene.
+
+**Data fra ERP-systemet**
+
+Datasettet inneholder:
+
+**105 varelinjer (SKU-er)**
+
+månedlige leveransevolumer
+
+opptil **48 observasjoner per varelinje**
+
+Totalt inneholder rådatasettet omtrent:
+
+**5 040 potensielle observasjoner (105 × 48 måneder).**
+
+Etter datarensing (data cleaning) kan antall brukbare observasjoner være
+noe lavere, ettersom enkelte varelinjer inneholder manglende verdier i
+deler av tidsperioden. Datarensingen vil blant annet bestå av:
+
+håndtering av manglende verdier
+
+kontroll av ekstreme observasjoner
+
+eventuelt fjerning av ufullstendige tidsserier
+
+**Tilgang til data**
+
+Datasettet er hentet fra virksomhetens interne ERP-system og kan derfor
+ikke gjøres offentlig tilgjengelig i sin opprinnelige form. De
+anonymiserte dataene er kun brukt til analyse i denne studien.
+Strukturen i datasettet og metodene som er brukt i analysen er
+imidlertid beskrevet slik at tilsvarende analyser kan gjennomføres på
+andre datasett med tilsvarende struktur.
+
+**Databehandling (Data Cleaning)**\
+Før analysen ble datasettet kontrollert og klargjort for statistisk
+modellering. Formålet med datarensingen var å sikre konsistens i
+tidsseriene og redusere risikoen for at feil i data påvirker
+prognosemodellene. Håndtering av manglende observasjoner og outliers er
+en viktig del av tidsserieanalyse, ettersom slike forhold kan påvirke
+både modelltilpasning og prognosepresisjon (Hyndman & Athanasopoulos,
+2021). Følgende steg ble gjennomført: kontroll av manglende
+observasjoner i tidsseriene, kontroll av ekstreme verdier (outliers),
+sikring av konsistent tidsstruktur med én observasjon per måned og
+konvertering av dato til månedlig tidsindeks. Manglende observasjoner
+ble håndtert ved å kontrollere om de skyldtes manglende salg eller
+manglende registrering. Dersom observasjonen representerte reelt
+nullsalg, ble verdien beholdt. Dersom observasjonen skyldtes manglende
+registrering, ble den enten korrigert eller ekskludert fra analysen.
+Etter datarensing besto datasettet av komplette månedlige tidsserier som
+kunne brukes til sammenligning av prognosemodeller.
+
+**Beskrivelse av datasettet**
+
+  -----------------------------------------------------------------------
+  **Variabel**                       **Beskrivelse**
+  ---------------------------------- ------------------------------------
+  Antall produkter (SKU)             105
+
+  Datakilde                          ERP-system
+
+  Geografisk område                  Norge
+
+  Distribusjonsledd                  Europeisk sentrallager til
+                                     grossister i Norge
+
+  Tidsperiode                        Jan 2022 -- Des 2025
+
+  Observasjonsnivå                   Måned
+
+  Maks observasjoner per SKU         48
+
+  Totalt antall potensielle          5 040
+  observasjoner                      
+  -----------------------------------------------------------------------
+
+# Modellering
+
+[]{#_Toc222057415 .anchor}Analyse
+
+Hvordan skrive bacheloroppgave etter at metodedelen er laget? Jo, du
+lager en analyse!
+
+Dette er siste bit før du kan presentere selve resultatene av studiene.
+Du kan velge mellom forskjellige metoder, nemlig:
+
+Kvalitativ metode (intervju eller lignende)
+
+Kvantitativ metode
+
+Dokumentanalyse
+
+Prat gjerne med veilederen din om du er usikker på hvilken metode som er
+best for akkurat din problemstilling.
+
+[]{#_Toc222057416 .anchor}Resultat
+
+Den kanskje viktigste delen når du skal skrive en bacheloroppgave, er
+resultatdelen. Her beskriver du alle funnene som er gjort i analyser og
+studier.
+
+Det er viktig at du presenterer resultatene på en klar og tydelig måte
+-- gjerne ved bruk av tabeller og figurer.
+
+Noen viktige punkter:
+
+Dersom dette er et eget kapittel så skal dere her kun presentere
+resultatene i form av tabeller og/eller figurer.
+
+Tabeller: Oppsummerte resultater
+
+Resultatene er direkte linket til forskningsspørsmålet!
+
+Dersom det ikke er det så er det to alternativer:
+
+Kjør analysene på nytt i henhold til forskningsspørsmålet
+
+Endre forskningsspørsmålet slik at det er samsvar med analysene
+
+NB: En forklarende tekst for hver tabell og hver figur!
+
+Som regel kommer teksten før tabellen/figuren, men noen ganger etter og
+noen ganger litt tekst først og litt etter tabellen/figuren.
+
+Dere vil synes at det er overflødig med forklarende tekst, men det må
+gjøres og kun det som dere ser: en objektiv presentasjon.
+
+[]{#_Toc222057417 .anchor}Diskusjon
+
+I diskusjonsdelen skal du diskutere de forskjellige funnene du har
+gjort. Her skal du blant annet inkludere en kritisk metodediskusjon, der
+du vurderer om metoden din var riktig.
+
+Diskuter hvor pålitelige funnene dine er, om de er generaliserbare og
+eventuelle svakheter. Forklar også hvorvidt studiet har gitt ny
+teoretisk innsikt, og om hypoteser kan avkreftes.
+
+Noen viktige punkter:
+
+Her skal resultatene diskuteres
+
+Studenter blander ofte sammen diskusjon og resultater\...
+
+Her skal dere kommentere de resultatene som dere har funnet
+
+Er dette som forventet?
+
+Uventede funn? Hvis ja hvordan kan dere forklare dette
+
+Stemmer deres resultater med forskningslitteraturen?
+
+Hvis ikke, hvorfor ikke? Og det kan være bra!
+
+Hvis ja, kan dere henvise til forskningslitteraturen for å understøtte
+deres resultater
+
+Resultatene diskuteres opp mot problemstillingen!•Har dere fått svar på
+forskningsspørsmålet?
+
+Hvilken betydning for næringslivet?
+
+Anbefales som eget punkt i diskusjonen (dette er et viktig punkt i
+oppgaven)
+
+Hva medfører deres resultater for næringslivet/bedriften?
+
+Hvilke endringer bør bedriften/næringslivet gjøre?
+
+Mulig å generalisere?
+
+Ta med begrensinger/svakheter i oppgaven
+
+Ikke overfokuser på dette punktet men vær ærlige
+
+[]{#_Toc222057418 .anchor}Konklusjon
+
+I oppgavens konklusjon oppsummerer du hovedfunn sett i forhold til
+problemstilling.
+
+Avslutt gjerne med spørsmål til videre forskning, og del personlige
+refleksjoner du eventuelt måtte ha.
+
+Hva er det viktigste dere har funnet?
+
+Konkludere i henhold til oppgavens problemstilling. Ofte begynner en
+konklusjon med å gjenta forskningsspørsmålet:
+
+«I denne oppgaven har analysert/redegjort for\...».
+
+«Hovedfunnene i oppgaven viser at \....»
+
+«På tross av de svakhetene som oppgaven har er det indikasjoner om at
+\...»
+
+I konklusjonen blir det ofte litt gjentagelse fra diskusjon/resultat men
+det er helt greit. Her skal dere dra frem de viktigste funnene og
+hvilken betydning det har for deres case.
+
+# Bibliografi
+
+# Vedlegg
+
+Referanseliste:
+
+Burinskiene, A. (2022). Forecasting model: The case of the
+pharmaceutical retail. *Frontiers in Medicine, 9*, 582186.
+<https://doi.org/10.3389/fmed.2020.582186>
+
+Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting
+system. In *Proceedings of the 22nd ACM SIGKDD International Conference
+on Knowledge Discovery and Data Mining* (pp. 785--794). Association for
+Computing Machinery. <https://doi.org/10.1145/2939672.2939785>
+
+Fourkiotis, K. P., & Tsadiras, A. K. (2024). Applying machine learning
+and statistical forecasting methods for enhancing pharmaceutical sales
+predictions. *Forecasting, 6*(1), 170--186.
+<https://doi.org/10.3390/forecast6010010>
+
+Hyndman, R. J., & Athanasopoulos, G. (2021). *Forecasting: Principles
+and practice* (3rd ed.). OTexts. <https://otexts.com/fpp3/>
+
+Lov om apotek (apotekloven). (2000). *Lov om apotek
+(LOV-2000-06-02-39).* <https://lovdata.no/dokument/NL/lov/2000-06-02-39>
+
+Box, G. E. P., Jenkins, G. M., Reinsel, G. C., & Ljung, G. M. (2015).
+*Time series analysis: Forecasting and control* (5th ed.). Wiley.
+
+Burinskiene, A. (2022). Forecasting model: The case of the
+pharmaceutical retail. *Frontiers in Medicine, 9*, 582186.
+https://doi.org/10.3389/fmed.2020.582186
+
+Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting
+system. In *Proceedings of the 22nd ACM SIGKDD International Conference
+on Knowledge Discovery and Data Mining* (pp. 785--794). Association for
+Computing Machinery. <https://doi.org/10.1145/2939672.2939785>
+
+Fourkiotis, K. P., & Tsadiras, A. K. (2024). Applying machine learning
+and statistical forecasting methods for enhancing pharmaceutical sales
+predictions. *Forecasting, 6*(1), 170--186.
+<https://doi.org/10.3390/forecast6010010>
+
+Hyndman, R. J., & Athanasopoulos, G. (2021). *Forecasting: Principles
+and practice* (3rd ed.). OTexts. <https://otexts.com/fpp3/>
+
+Petropoulos, F., Spiliotis, E., & Assimakopoulos, V. (2022).
+Forecasting: Theory and practice. *International Journal of Forecasting,
+38*(3), 705--871. <https://doi.org/10.1016/j.ijforecast.2021.11.001>
+
+Zhu, X., Ninh, A., Zhao, H., & Liu, Z. (2021). Demand forecasting with
+supply chain information and machine learning: Evidence in the
+pharmaceutical industry. *Production and Operations Management, 30*(10),
+3231--3252. https://doi.org/10.1111/poms.13458
