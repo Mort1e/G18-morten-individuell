@@ -218,23 +218,24 @@ def run_dm_test(df, results):
     """DM-test mellom Holt-Winters og ARIMA over alle SKU-er."""
     try:
         from dieboldmariano import dm_test as dm
-        hw_errors, arima_errors = [], []
-        for i, sku in enumerate(df.index):
+        actuals, hw_preds, arima_preds = [], [], []
+        for sku in df.index:
             series = df.loc[sku].values.astype(float)
             train  = series[:TRAIN_END]
             actual = series[TRAIN_END:TRAIN_END + TEST_PERIODS]
             hw_pred    = holtwinters_forecast(train)
             arima_pred = arima_forecast(train)
-            hw_errors.extend(list(actual - hw_pred[:TEST_PERIODS]))
-            arima_errors.extend(list(actual - arima_pred[:TEST_PERIODS]))
-        stat, p = dm(hw_errors, arima_errors, h=1)
+            actuals.extend(list(actual))
+            hw_preds.extend(list(hw_pred[:TEST_PERIODS]))
+            arima_preds.extend(list(arima_pred[:TEST_PERIODS]))
+        stat, p = dm(actuals, hw_preds, arima_preds, h=1)
         print(f"\nDiebold-Mariano test (Holt-Winters vs ARIMA):")
         print(f"  DM-statistikk : {stat:.4f}")
         print(f"  p-verdi       : {p:.4f}")
         print(f"  Konklusjon    : {'Signifikant forskjell (p<0.05)' if p < 0.05 else 'Ingen signifikant forskjell'}")
         return stat, p
-    except ImportError:
-        print("\nInstaller dieboldmariano: pip install dieboldmariano")
+    except Exception as e:
+        print(f"\nDM-test feilet: {e}")
         return None, None
 
 
