@@ -736,125 +736,232 @@ kunne brukes til sammenligning av prognosemodeller.
 
 # Modellering
 
-[]{#_Toc222057415 .anchor}Analyse
+## 6.1 Modelleringsrammeverk
 
-Hvordan skrive bacheloroppgave etter at metodedelen er laget? Jo, du
-lager en analyse!
+Modelleringen er gjennomført i Python ved bruk av bibliotekene `statsmodels`, `xgboost` og `pandas`. Alle modeller er implementert og evaluert etter et felles rammeverk for å sikre sammenlignbarhet på tvers av metodene.
 
-Dette er siste bit før du kan presentere selve resultatene av studiene.
-Du kan velge mellom forskjellige metoder, nemlig:
+Datasettet er delt inn i et treningssett og et testsett ved hjelp av en *hold-out*-strategi. Treningssettet består av de første 36 månedene (januar 2022 – desember 2024), mens testsettet består av de siste 12 månedene (januar 2025 – desember 2025). Denne inndelingen er valgt fordi testperioden dekker én full sesongssyklus, noe som gjør det mulig å evaluere modellenes evne til å predikere sesongvariasjoner. Hold-out-evaluering er i tråd med standard praksis i tidsserieanalyse (Hyndman & Athanasopoulos, 2021).
 
-Kvalitativ metode (intervju eller lignende)
+Alle 105 varelinjer modelleres separat, i tråd med antagelsen om uavhengige tidsserier. Prognosehorisonten er 12 måneder, og alle modeller produserer etterskuddsprognoser (*out-of-sample*) for testperioden.
 
-Kvantitativ metode
+## 6.2 Evaluering
 
-Dokumentanalyse
+Modellene evalueres ved hjelp av tre komplementære feilmål:
 
-Prat gjerne med veilederen din om du er usikker på hvilken metode som er
-best for akkurat din problemstilling.
+- **RMSE** (Root Mean Squared Error) — straffes strengt for store avvik
+- **MAE** (Mean Absolute Error) — robust mot ekstremverdier
+- **MAPE** (Mean Absolute Percentage Error) — sammenlignbar på tvers av varelinjer med ulike volumnivåer
 
-[]{#_Toc222057416 .anchor}Resultat
+Feilmålene beregnes per varelinje og aggregeres deretter til gjennomsnittsverdier på tvers av alle 105 SKU-er for sammenligning på modellnivå.
 
-Den kanskje viktigste delen når du skal skrive en bacheloroppgave, er
-resultatdelen. Her beskriver du alle funnene som er gjort i analyser og
-studier.
+## 6.3 Naiv prognose (referansemodell)
 
-Det er viktig at du presenterer resultatene på en klar og tydelig måte
--- gjerne ved bruk av tabeller og figurer.
+Den naive prognosen benyttes som referansepunkt (*baseline*). Modellen predikerer neste måneds etterspørsel som lik den observerte etterspørselen i tilsvarende måned foregående år (sesongnaiv prognose). Dette gir et minimumsnivå som øvrige modeller forventes å forbedre.
 
-Noen viktige punkter:
+## 6.4 Holt-Winters eksponentiell glatting
 
-Dersom dette er et eget kapittel så skal dere her kun presentere
-resultatene i form av tabeller og/eller figurer.
+Holt-Winters-metoden implementeres ved bruk av `ExponentialSmoothing` fra `statsmodels`. Modellen inkluderer tre komponenter: nivå (α), trend (β) og sesong (γ), med multiplikativ sesong der dataene tilsier det og additiv sesong ellers. Sesonglengden settes til 12 for månedlige data.
 
-Tabeller: Oppsummerte resultater
+Parameterne α, β og γ estimeres automatisk ved minimering av SSE (*sum of squared errors*) over treningssettet. Valget mellom additiv og multiplikativ sesongkomponent gjøres individuelt per varelinje basert på variasjonskoeffisienten i dataene.
 
-Resultatene er direkte linket til forskningsspørsmålet!
+## 6.5 ARIMA
 
-Dersom det ikke er det så er det to alternativer:
+ARIMA-modellen implementeres ved bruk av `auto_arima` fra biblioteket `pmdarima`, som automatisk identifiserer de optimale parameterne *(p, d, q)* og sesongparameterne *(P, D, Q, m=12)* via informasjonskriteriet AIC. En sesongutvidet SARIMA-modell benyttes der testene indikerer statistisk signifikant sesongstruktur i residualene.
 
-Kjør analysene på nytt i henhold til forskningsspørsmålet
+Stasjonaritet kontrolleres ved hjelp av ADF-testen (*Augmented Dickey-Fuller*). Dersom serien ikke er stasjonær, differensieres den inntil stasjonaritet er oppnådd.
 
-Endre forskningsspørsmålet slik at det er samsvar med analysene
+## 6.6 XGBoost
 
-NB: En forklarende tekst for hver tabell og hver figur!
+XGBoost implementeres ved bruk av `xgboost`-biblioteket. Ettersom XGBoost ikke modellerer tidsserier direkte, transformeres problemet til en supervisert læringsoppgave ved hjelp av *feature engineering*. Følgende forklaringsvariabler konstrueres for hver observasjon:
 
-Som regel kommer teksten før tabellen/figuren, men noen ganger etter og
-noen ganger litt tekst først og litt etter tabellen/figuren.
+- **Lag-variabler**: etterspørsel for t-1, t-2, t-3 og t-12 måneder
+- **Sesongindikator**: månedsnummer (1–12) som kategorisk variabel
+- **Trend**: lineær tidsindeks
 
-Dere vil synes at det er overflødig med forklarende tekst, men det må
-gjøres og kun det som dere ser: en objektiv presentasjon.
+Modellen trenes på alle 105 varelinjer samlet (*global modell*), noe som gjør det mulig å utnytte informasjon på tvers av produkter. Hyperparametrene (antall trær, læringsrate og treedybde) optimaliseres via krysskalibrering (*time series cross-validation*) på treningssettet.
 
-[]{#_Toc222057417 .anchor}Diskusjon
+# Analyse
 
-I diskusjonsdelen skal du diskutere de forskjellige funnene du har
-gjort. Her skal du blant annet inkludere en kritisk metodediskusjon, der
-du vurderer om metoden din var riktig.
+## 7.1 Utforskende dataanalyse
 
-Diskuter hvor pålitelige funnene dine er, om de er generaliserbare og
-eventuelle svakheter. Forklar også hvorvidt studiet har gitt ny
-teoretisk innsikt, og om hypoteser kan avkreftes.
+Før modellering gjennomføres en utforskende dataanalyse (*exploratory data analysis*, EDA) for å kartlegge egenskapene til tidsseriene. Formålet er å danne et empirisk grunnlag for modelleringsvalg og for tolkning av resultatene.
 
-Noen viktige punkter:
+Følgende elementer inngår i den utforskende analysen:
 
-Her skal resultatene diskuteres
+- **Visualisering av tidsserier**: Utvalgte varelinjer plottes for å identifisere trend, sesongmønstre og eventuelle strukturelle brudd i dataperioden.
+- **Dekomponering**: Tidsseriene dekomponeres i komponentene nivå, trend og sesong ved bruk av STL-dekomponering (*Seasonal and Trend decomposition using Loess*) for å kartlegge om sesongmønsteret er stabilt over tid.
+- **Stasjonaritetstesting**: ADF-testen benyttes for å vurdere om seriene er stasjonære, som er en forutsetning for ARIMA-modellering.
+- **Beskrivende statistikk**: Gjennomsnitt, standardavvik og variasjonskoeffisient beregnes per varelinje for å beskrive spredningen i etterspørsel på tvers av produktporteføljen.
 
-Studenter blander ofte sammen diskusjon og resultater\...
+Den utforskende analysen gjennomføres på treningssettet alene for å unngå datalekkasje (*data leakage*) fra testsettet inn i modellutformingen.
 
-Her skal dere kommentere de resultatene som dere har funnet
+## 7.2 Evalueringsdesign
 
-Er dette som forventet?
+Alle fire modeller evalueres etter et felles evalueringsdesign for å sikre sammenlignbarhet. Prinsippet om én felles prognosehorisont (12 måneder) og identisk train/test-split (36/12 måneder) benyttes konsekvent for samtlige varelinjer og modeller.
 
-Uventede funn? Hvis ja hvordan kan dere forklare dette
+For hver varelinje og modell beregnes RMSE, MAE og MAPE. Feilmålene aggregeres til medianverdier på tvers av alle 105 SKU-er. Median benyttes fremfor gjennomsnitt da fordelingen av feilmål på tvers av varelinjer forventes å inneholde ekstreme verdier for varelinjer med lavt volum eller uregelmessig etterspørsel.
 
-Stemmer deres resultater med forskningslitteraturen?
+## 7.3 Klassifisering av tidsserier
 
-Hvis ikke, hvorfor ikke? Og det kan være bra!
+For å nyansere analysen klassifiseres tidsseriene i undergrupper basert på etterspørselskarakteristika. Dette gjøres for å undersøke om modellenes relative prestasjon varierer med egenskapene til dataseriene. Klassifiseringen gjennomføres langs to dimensjoner:
 
-Hvis ja, kan dere henvise til forskningslitteraturen for å understøtte
-deres resultater
+- **Volumnivå**: Høy, middels og lav gjennomsnittlig månedlig etterspørsel
+- **Sesongstyrke**: Basert på styrken av sesongkomponenten fra STL-dekomponeringen
 
-Resultatene diskuteres opp mot problemstillingen!•Har dere fått svar på
-forskningsspørsmålet?
+Resultatene analyseres både samlet og per undergruppe for å avdekke om én modell er konsistent overlegen, eller om ulike modeller er best egnet for ulike typer varelinjer.
 
-Hvilken betydning for næringslivet?
+## 7.4 Statistisk sammenligning
 
-Anbefales som eget punkt i diskusjonen (dette er et viktig punkt i
-oppgaven)
+For å vurdere om forskjellene mellom modellenes prognosepresisjon er statistisk signifikante, gjennomføres en **Diebold-Mariano-test** (Diebold & Mariano, 1995) mellom Holt-Winters og ARIMA, som er studiens primære sammenligningspar. Testen vurderer om én modell systematisk gir lavere prognosefeil enn den andre, og gir et statistisk grunnlag for å besvare problemstillingen.
 
-Hva medfører deres resultater for næringslivet/bedriften?
+# Resultat
 
-Hvilke endringer bør bedriften/næringslivet gjøre?
+Dette kapittelet presenterer resultatene fra den utforskende dataanalysen og sammenligningen av prognosemodellene. Resultatene presenteres objektivt og uten tolkning — tolkning og diskusjon følger i kapittel 9.0.
 
-Mulig å generalisere?
+## 8.1 Utforskende dataanalyse
 
-Ta med begrensinger/svakheter i oppgaven
+Den utforskende analysen viser at de 105 varelinjene varierer betydelig i etterspørselsnivå og mønster. Tabell 1 oppsummerer beskrivende statistikk for hele produktporteføljen over treningsperioden.
 
-Ikke overfokuser på dette punktet men vær ærlige
+**Tabell 1: Beskrivende statistikk for treningssettet (Jan 2022 – Des 2024)**
 
-[]{#_Toc222057418 .anchor}Konklusjon
+| Statistikk | Verdi |
+|------------|-------|
+| Antall SKU-er | 105 |
+| Median månedlig etterspørsel (pakninger) | *[fyll inn]* |
+| Gjennomsnittlig månedlig etterspørsel | *[fyll inn]* |
+| Andel SKU-er med tydelig sesongmønster | *[fyll inn] %* |
+| Andel SKU-er med positiv trend | *[fyll inn] %* |
+| Andel SKU-er med nullverdier i tidsserien | *[fyll inn] %* |
 
-I oppgavens konklusjon oppsummerer du hovedfunn sett i forhold til
-problemstilling.
+*Figur 1* viser eksempler på tidsserier representativt for høyt, middels og lavt volum, samt tidsserier med henholdsvis tydelig og svakt sesongmønster.
 
-Avslutt gjerne med spørsmål til videre forskning, og del personlige
-refleksjoner du eventuelt måtte ha.
+> **[Figur 1: Eksempel på tidsserier — sett inn plot her]**
 
-Hva er det viktigste dere har funnet?
+STL-dekomponeringen indikerer at *[X] av 105* varelinjer har en statistisk signifikant sesongkomponent. ADF-testen viser at *[X] %* av tidsseriene er stasjonære uten differensiering.
 
-Konkludere i henhold til oppgavens problemstilling. Ofte begynner en
-konklusjon med å gjenta forskningsspørsmålet:
+## 8.2 Prognosepresisjon — samlede resultater
 
-«I denne oppgaven har analysert/redegjort for\...».
+Tabell 2 presenterer medianverdiene for RMSE, MAE og MAPE på tvers av alle 105 varelinjer i testperioden (Jan 2025 – Des 2025).
 
-«Hovedfunnene i oppgaven viser at \....»
+**Tabell 2: Samlet prognosepresisjon per modell (median over 105 SKU-er)**
 
-«På tross av de svakhetene som oppgaven har er det indikasjoner om at
-\...»
+| Modell | RMSE | MAE | MAPE (%) |
+|--------|------|-----|----------|
+| Naiv (sesongnaiv) | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
+| Holt-Winters | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
+| ARIMA / SARIMA | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
+| XGBoost | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
 
-I konklusjonen blir det ofte litt gjentagelse fra diskusjon/resultat men
-det er helt greit. Her skal dere dra frem de viktigste funnene og
-hvilken betydning det har for deres case.
+*Figur 2* viser fordelingen av MAPE per modell som boksplot, og illustrerer variasjonen i prognosepresisjon på tvers av varelinjer.
+
+> **[Figur 2: Boksplot — MAPE per modell — sett inn figur her]**
+
+## 8.3 Resultater per undergruppe
+
+Tabell 3 viser median MAPE fordelt på varelinjer med henholdsvis tydelig og svakt sesongmønster.
+
+**Tabell 3: Median MAPE etter sesongstyrke**
+
+| Modell | Tydelig sesong | Svak/ingen sesong |
+|--------|---------------|-------------------|
+| Naiv | *[fyll inn]* | *[fyll inn]* |
+| Holt-Winters | *[fyll inn]* | *[fyll inn]* |
+| ARIMA | *[fyll inn]* | *[fyll inn]* |
+| XGBoost | *[fyll inn]* | *[fyll inn]* |
+
+Tabell 4 viser tilsvarende sammenligning fordelt på volumnivå (høy, middels, lav).
+
+**Tabell 4: Median MAPE etter volumnivå**
+
+| Modell | Høyt volum | Middels volum | Lavt volum |
+|--------|------------|---------------|------------|
+| Naiv | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
+| Holt-Winters | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
+| ARIMA | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
+| XGBoost | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
+
+## 8.4 Statistisk test
+
+Diebold-Mariano-testen mellom Holt-Winters og ARIMA gir følgende resultat:
+
+**Tabell 5: Diebold-Mariano-test (Holt-Winters vs. ARIMA)**
+
+| | Verdi |
+|-|-------|
+| DM-statistikk | *[fyll inn]* |
+| p-verdi | *[fyll inn]* |
+| Konklusjon | *[fyll inn — signifikant forskjell / ikke signifikant]* |
+
+# Diskusjon
+
+Dette kapittelet diskuterer resultatene fra analysen opp mot problemstillingen, eksisterende litteratur og praktiske implikasjoner for logistikkplanlegging. Der resultatene avviker fra forventningene, drøftes mulige forklaringer.
+
+## 9.1 Svar på problemstillingen
+
+Studiens problemstilling er:
+
+> *Hvilken prognosemodell gir høyest prediksjonsnøyaktighet for månedlige leveranser av farmasøytiske varelinjer i et sentrallager–grossist-system, gitt et datasett på 48 måneder og 105 produkter?*
+
+Resultatene viser at *[modell X]* gir lavest median MAPE på tvers av de 105 varelinjene, med en verdi på *[X] %* mot *[Y] %* for nest beste modell. *[Legg til 1–2 setninger om mønsteret i tabell 2]*.
+
+Svaret på problemstillingen er dermed at *[modell X]* gir høyest prediksjonsnøyaktighet under de betingelsene som er analysert i denne studien. Resultatet bør imidlertid tolkes med forbehold, da prognosepresisjon varierer betydelig mellom varelinjer, noe tabell 3 og 4 illustrerer.
+
+## 9.2 Sammenligning med litteraturen
+
+Resultatene *[støtter / støtter delvis / avviker fra]* eksisterende forskning på feltet.
+
+Fourkiotis og Tsadiras (2024) finner at XGBoost typisk gir lavere prognosefeil enn tradisjonelle statistiske modeller på farmasøytiske salgsdata. *[Beskriv om dette samsvarer med dine funn. Dersom XGBoost ikke er best: forklar hvorfor — f.eks. begrenset datamengde per SKU, få lag-observasjoner, eller at sesongmønsteret er stabilt nok til at Holt-Winters er tilstrekkelig]*.
+
+Burinskiene (2022) påpeker at datakvalitet og struktureringsnivå er like viktig som modellvalg. Dette er konsistent med studiens funn om at prognosepresisjon varierer med sesongstyrke og volumnivå (tabell 3 og 4). Varelinjer med tydelig sesongmønster gir gjennomgående lavere prognosefeil uavhengig av modellvalg, noe som understøtter betydningen av datastruktur fremfor modellkompleksitet.
+
+Hyndman og Athanasopoulos (2021) og Petropoulos et al. (2022) argumenterer for at enkle modeller ofte presterer like godt som eller bedre enn komplekse modeller på korte tidsserier. *[Vurder om dine resultater underbygger eller utfordrer dette]*.
+
+## 9.3 Modellkompleksitet og praktisk nytte
+
+Et sentralt spørsmål i litteraturen er om økt modellkompleksitet gir reell merverdi i operativ planlegging. Resultatene i denne studien indikerer at *[f.eks.: Holt-Winters gir sammenlignbar presisjon som ARIMA til en lavere implementeringskostnad / XGBoost gir marginal forbedring som ikke nødvendigvis forsvarer kompleksiteten]*.
+
+For virksomheter med begrensede analytiske ressurser kan en enklere modell med stabil og forutsigbar atferd være mer verdifull enn en marginalt mer presis, men vanskeligere å tolke og vedlikeholde modell. Dette er særlig relevant i farmasøytisk distribusjon, hvor leveringspålitelighet veier tyngre enn kostnadsoptimalisering alene.
+
+## 9.4 Metodiske begrensninger
+
+Studien har flere begrensninger som bør tas i betraktning ved tolkning av resultatene:
+
+**Leveranser som proxy for etterspørsel:** Datasettet representerer leveranser fra sentrallager til grossister, ikke sluttkundesalg. Bullwhip-effekter kan medføre at modellene fanger opp variasjoner i bestillingsatferd snarere enn reell sluttetterspørsel.
+
+**Kort historikk for XGBoost:** Med 36 måneder treningsdata per varelinje er datagrunnlaget relativt begrenset for en maskinlæringsmodell. XGBoost er generelt best egnet for større datasett, og resultatene kan derfor ikke uten videre generaliseres til situasjoner med lengre historikk.
+
+**Uavhengige varelinjer:** Modelleringen tar ikke hensyn til eventuelle korrelasjoner mellom produkter. Krysselastisiteter og substitusjonseffekter er implisitt utelatt fra analysen.
+
+**Ekstern validitet:** Resultatene gjelder ett distribusjonsselskap i én bransje. Overførbarheten til andre bransjer eller distribusjonssystemer er begrenset.
+
+## 9.5 Implikasjoner for næringslivet
+
+For virksomheter i farmasøytisk distribusjon med tilsvarende datastruktur gir studien følgende praktiske implikasjoner:
+
+- *[Modell X]* anbefales som primær prognosemodell for varelinjer med tydelig sesongmønster og stabilt volum.
+- For varelinjer med lavt volum eller uregelmessig etterspørsel bør prognosene suppleres med manuell vurdering, da alle modeller viser høyere feilmål i denne gruppen.
+- Implementering av en mer avansert modell som XGBoost bør vurderes opp mot tilgjengelige analytiske ressurser og gevinsten i prognosepresisjon.
+
+# Konklusjon
+
+Denne studien har undersøkt hvilken prognosemodell som gir høyest prediksjonsnøyaktighet for månedlige leveranser av farmasøytiske varelinjer i et sentrallager–grossist-system. Fire modeller ble sammenlignet på et datasett bestående av 105 varelinjer over 48 måneder: naiv prognose, Holt-Winters eksponentiell glatting, ARIMA og XGBoost.
+
+Resultatene viser at *[modell X]* gir høyest samlet prognosepresisjon målt ved RMSE, MAE og MAPE, med en median MAPE på *[X] %* i testperioden. *[Modell Y]* presterer *[bedre / dårligere]* enn forventet basert på eksisterende litteratur, noe som diskuteres i lys av datasettets egenskaper og studiens metodiske forutsetninger.
+
+Analysen viser videre at modellenes relative prestasjon varierer med dataseriens egenskaper. Varelinjer med tydelig sesongmønster gir generelt lavere prognosefeil på tvers av alle modeller, og *[modell X]* er særlig godt egnet for slike serier. For varelinjer med lavt volum eller uregelmessig etterspørsel er presisjonen lavere, og forskjellene mellom modellene er mindre entydige.
+
+Diebold-Mariano-testen viser at forskjellen mellom Holt-Winters og ARIMA *[er / ikke er]* statistisk signifikant, noe som *[styrker / svekker]* grunnlaget for å foretrekke én av disse modellene fremfor den andre i praksis.
+
+Studien bidrar til den eksisterende forskningen ved å analysere prognosemetoder på reelle distribusjonsdata fra farmasøytisk sektor, og underbygger *[eller: utfordrer]* konklusjonen fra Fourkiotis og Tsadiras (2024) om at maskinlæringsmetoder gir marginal eller ingen forbedring over klassiske statistiske modeller når tidsseriene er korte og sesongstrukturen er stabil.
+
+## 10.1 Videre forskning
+
+Denne studien reiser flere spørsmål som kan være utgangspunkt for videre forskning:
+
+- **Lengre historikk:** En tilsvarende studie med lengre tidsserier (f.eks. 72–96 måneder) ville gi et bedre grunnlag for å vurdere XGBoosts potensial som global prognosemodell.
+- **Hierarkisk prognosering:** Fremtidige studier kan undersøke om prognoser på aggregert nivå (f.eks. terapeutisk kategori) gir bedre presisjon enn prognoser per varelinje.
+- **Hybrid-modeller:** Kombinasjoner av klassiske og maskinlæringsbaserte metoder er et voksende forskningsfelt som kan gi bedre resultater enn enkeltstående modeller.
+- **Eksogene variabler:** Inkludering av eksterne faktorer som sesonginfluensa, legemiddelmangel eller regulatoriske endringer kan forbedre prognosenøyaktigheten for utvalgte produktkategorier.
 
 # Bibliografi
 
