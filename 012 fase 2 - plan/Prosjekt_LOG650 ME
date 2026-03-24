@@ -827,11 +827,11 @@ Den utforskende analysen viser at de 105 varelinjene varierer betydelig i etters
 | Statistikk | Verdi |
 |------------|-------|
 | Antall SKU-er | 105 |
-| Median månedlig etterspørsel (pakninger) | *[fyll inn etter EDA]* |
-| Gjennomsnittlig månedlig etterspørsel | *[fyll inn etter EDA]* |
-| Andel SKU-er med tydelig sesongmønster | *[fyll inn etter EDA] %* |
-| Andel SKU-er med positiv trend | *[fyll inn etter EDA] %* |
-| Andel SKU-er med nullverdier i tidsserien | *[fyll inn etter EDA] %* |
+| Median månedlig etterspørsel (pakninger) | 1 022 |
+| Gjennomsnittlig månedlig etterspørsel | 2 521 |
+| Andel SKU-er med tydelig sesongmønster | 70,5 % |
+| Andel SKU-er med positiv trend | 53,3 % |
+| Andel SKU-er med nullverdier i tidsserien | 76,2 % |
 
 *Figur 1* viser et eksempel på prognose for én varelinje sammenlignet med faktisk etterspørsel i testperioden.
 
@@ -864,10 +864,10 @@ Tabell 3 viser median MAPE fordelt på varelinjer med henholdsvis tydelig og sva
 
 | Modell | Tydelig sesong | Svak/ingen sesong |
 |--------|---------------|-------------------|
-| Naiv | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
-| Holt-Winters | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
-| ARIMA | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
-| XGBoost | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
+| Naiv | 70,20 % | 59,95 % |
+| Holt-Winters | 64,26 % | 59,34 % |
+| ARIMA | 63,09 % | 49,50 % |
+| XGBoost | 62,86 % | 39,37 % |
 
 Tabell 4 viser tilsvarende sammenligning fordelt på volumnivå (høy, middels, lav).
 
@@ -875,10 +875,10 @@ Tabell 4 viser tilsvarende sammenligning fordelt på volumnivå (høy, middels, 
 
 | Modell | Høyt volum | Middels volum | Lavt volum |
 |--------|------------|---------------|------------|
-| Naiv | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
-| Holt-Winters | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
-| ARIMA | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
-| XGBoost | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
+| Naiv | 58,11 % | 68,02 % | 86,07 % |
+| Holt-Winters | 60,85 % | 63,84 % | 62,49 % |
+| ARIMA | 52,21 % | 60,20 % | 61,48 % |
+| XGBoost | 45,52 % | 51,53 % | 82,33 % |
 
 ## 8.4 Statistisk test
 
