@@ -902,25 +902,29 @@ Studiens problemstilling er:
 
 > *Hvilken prognosemodell gir høyest prediksjonsnøyaktighet for månedlige leveranser av farmasøytiske varelinjer i et sentrallager–grossist-system, gitt et datasett på 48 måneder og 105 produkter?*
 
-Resultatene viser at *[modell X]* gir lavest median MAPE på tvers av de 105 varelinjene, med en verdi på *[X] %* mot *[Y] %* for nest beste modell. *[Legg til 1–2 setninger om mønsteret i tabell 2]*.
+Resultatene viser at XGBoost gir lavest median MAPE på tvers av de 105 varelinjene, med en verdi på 51,97 % mot 57,77 % for ARIMA og 62,49 % for Holt-Winters. XGBoost er overlegen på alle tre feilmål — RMSE (757,23), MAE (654,94) og MAPE (51,97 %) — sammenlignet med samtlige øvrige modeller. Alle fire modeller forbedrer seg konsistent over den naive referanseprognosen, som hadde en median MAPE på 67,50 %.
 
-Svaret på problemstillingen er dermed at *[modell X]* gir høyest prediksjonsnøyaktighet under de betingelsene som er analysert i denne studien. Resultatet bør imidlertid tolkes med forbehold, da prognosepresisjon varierer betydelig mellom varelinjer, noe tabell 3 og 4 illustrerer.
+Svaret på problemstillingen er dermed at XGBoost gir høyest prediksjonsnøyaktighet under de betingelsene som er analysert i denne studien. Resultatet bør imidlertid tolkes med forbehold, da XGBoost her er implementert som en global modell som utnytter mønstre på tvers av alle 105 SKU-er, mens Holt-Winters og ARIMA er tilpasset individuelt per varelinje.
 
 ## 9.2 Sammenligning med litteraturen
 
-Resultatene *[støtter / støtter delvis / avviker fra]* eksisterende forskning på feltet.
+Resultatene støtter eksisterende forskning på feltet.
 
-Fourkiotis og Tsadiras (2024) finner at XGBoost typisk gir lavere prognosefeil enn tradisjonelle statistiske modeller på farmasøytiske salgsdata. *[Beskriv om dette samsvarer med dine funn. Dersom XGBoost ikke er best: forklar hvorfor — f.eks. begrenset datamengde per SKU, få lag-observasjoner, eller at sesongmønsteret er stabilt nok til at Holt-Winters er tilstrekkelig]*.
+Fourkiotis og Tsadiras (2024) finner at XGBoost typisk gir lavere prognosefeil enn tradisjonelle statistiske modeller på farmasøytiske salgsdata. Dette er konsistent med funnene i denne studien, der XGBoost gir en MAPE-forbedring på 10,52 prosentpoeng sammenlignet med den naive prognosen og 10,52 prosentpoeng over Holt-Winters. Forbedringen er imidlertid moderat, og de klassiske modellene (Holt-Winters og ARIMA) presterer fortsatt vesentlig bedre enn referansenivået.
 
-Burinskiene (2022) påpeker at datakvalitet og struktureringsnivå er like viktig som modellvalg. Dette er konsistent med studiens funn om at prognosepresisjon varierer med sesongstyrke og volumnivå (tabell 3 og 4). Varelinjer med tydelig sesongmønster gir gjennomgående lavere prognosefeil uavhengig av modellvalg, noe som understøtter betydningen av datastruktur fremfor modellkompleksitet.
+Burinskiene (2022) påpeker at datakvalitet og struktureringsnivå er like viktig som modellvalg. Dette er relevant for forståelsen av hvorfor Holt-Winters og ARIMA yter relativt godt på dette datasettet: leveransedataene fra et sentrallager-grossist-system har en relativt stabil struktur med begrenset støy, noe som favoriserer klassiske tidsseriemodeller.
 
-Hyndman og Athanasopoulos (2021) og Petropoulos et al. (2022) argumenterer for at enkle modeller ofte presterer like godt som eller bedre enn komplekse modeller på korte tidsserier. *[Vurder om dine resultater underbygger eller utfordrer dette]*.
+Hyndman og Athanasopoulos (2021) og Petropoulos et al. (2022) argumenterer for at enkle modeller ofte presterer like godt som komplekse modeller på korte tidsserier. Studiens resultater utfordrer delvis dette synet — XGBoost gir konsistent lavere feilmål — men bekrefter samtidig at forskjellene er relativt moderate, og at Holt-Winters gir akseptabel prognosepresisjon med langt lavere implementeringskompleksitet.
+
+Diebold-Mariano-testen viser ingen statistisk signifikant forskjell mellom Holt-Winters og ARIMA (DM = 1,508, p = 0,132). Dette indikerer at de to klassiske metodene er likeverdige i presisjonsevne på dette datasettet, til tross for at ARIMA gir noe lavere RMSE og MAPE i gjennomsnitt.
 
 ## 9.3 Modellkompleksitet og praktisk nytte
 
-Et sentralt spørsmål i litteraturen er om økt modellkompleksitet gir reell merverdi i operativ planlegging. Resultatene i denne studien indikerer at *[f.eks.: Holt-Winters gir sammenlignbar presisjon som ARIMA til en lavere implementeringskostnad / XGBoost gir marginal forbedring som ikke nødvendigvis forsvarer kompleksiteten]*.
+Et sentralt spørsmål i litteraturen er om økt modellkompleksitet gir reell merverdi i operativ planlegging. Resultatene i denne studien viser at XGBoost gir den beste prognosepresisjon, men forbedringen over Holt-Winters på MAPE er på om lag 10,5 prosentpoeng. Spørsmålet er om denne gevinsten forsvarer den økte implementeringskompleksiteten.
 
-For virksomheter med begrensede analytiske ressurser kan en enklere modell med stabil og forutsigbar atferd være mer verdifull enn en marginalt mer presis, men vanskeligere å tolke og vedlikeholde modell. Dette er særlig relevant i farmasøytisk distribusjon, hvor leveringspålitelighet veier tyngre enn kostnadsoptimalisering alene.
+For virksomheter med tilgjengelig datakompetanse og Python-infrastruktur vil XGBoost være et godt valg. For virksomheter med begrensede analytiske ressurser vil Holt-Winters gi tilfredsstillende prognoser med langt lavere krav til vedlikehold og tolkning. Dette er særlig relevant i farmasøytisk distribusjon, hvor leveringspålitelighet og forutsigbarhet veier tyngre enn marginal presisjonsgevinst.
+
+Videre er det verdt å merke seg at ARIMA ikke gir signifikant bedre prognoser enn Holt-Winters (p = 0,132), noe som taler mot den ekstra modelltilpasningskostnaden ARIMA krever i form av parametervalg og stasjonaritetstesting.
 
 ## 9.4 Metodiske begrensninger
 
@@ -928,9 +932,9 @@ Studien har flere begrensninger som bør tas i betraktning ved tolkning av resul
 
 **Leveranser som proxy for etterspørsel:** Datasettet representerer leveranser fra sentrallager til grossister, ikke sluttkundesalg. Bullwhip-effekter kan medføre at modellene fanger opp variasjoner i bestillingsatferd snarere enn reell sluttetterspørsel.
 
-**Kort historikk for XGBoost:** Med 36 måneder treningsdata per varelinje er datagrunnlaget relativt begrenset for en maskinlæringsmodell. XGBoost er generelt best egnet for større datasett, og resultatene kan derfor ikke uten videre generaliseres til situasjoner med lengre historikk.
+**Kort historikk for XGBoost:** Med 36 måneder treningsdata per varelinje er datagrunnlaget relativt begrenset for en maskinlæringsmodell. XGBoost er generelt best egnet for større datasett, og resultatene kan derfor ikke uten videre generaliseres til situasjoner med lengre historikk. Med mer data ville XGBoost potensielt gitt enda større fordel over de klassiske modellene.
 
-**Uavhengige varelinjer:** Modelleringen tar ikke hensyn til eventuelle korrelasjoner mellom produkter. Krysselastisiteter og substitusjonseffekter er implisitt utelatt fra analysen.
+**Uavhengige varelinjer:** Holt-Winters og ARIMA er modellert individuelt per varelinje, mens XGBoost er trent som en global modell på alle 105 SKU-er. Denne asymmetrien kan ha gitt XGBoost en fordel, og resultatene bør tolkes i lys av dette metodiske valget.
 
 **Ekstern validitet:** Resultatene gjelder ett distribusjonsselskap i én bransje. Overførbarheten til andre bransjer eller distribusjonssystemer er begrenset.
 
@@ -938,21 +942,22 @@ Studien har flere begrensninger som bør tas i betraktning ved tolkning av resul
 
 For virksomheter i farmasøytisk distribusjon med tilsvarende datastruktur gir studien følgende praktiske implikasjoner:
 
-- *[Modell X]* anbefales som primær prognosemodell for varelinjer med tydelig sesongmønster og stabilt volum.
-- For varelinjer med lavt volum eller uregelmessig etterspørsel bør prognosene suppleres med manuell vurdering, da alle modeller viser høyere feilmål i denne gruppen.
-- Implementering av en mer avansert modell som XGBoost bør vurderes opp mot tilgjengelige analytiske ressurser og gevinsten i prognosepresisjon.
+- **XGBoost** anbefales som prognosemodell der datakompetanse og Python-infrastruktur er tilgjengelig, særlig for virksomheter med mange SKU-er som kan dra nytte av en global modell.
+- **Holt-Winters** anbefales som et robust og enkelt alternativ for virksomheter uten avansert analysekapasitet — modellen gir akseptabel presisjon og er lett å implementere og vedlikeholde.
+- Det er ikke grunnlag for å foretrekke ARIMA over Holt-Winters på dette datasettet, gitt at Diebold-Mariano-testen ikke viser signifikant forskjell og ARIMA krever mer kompleks modelltilpasning.
+- For varelinjer med lavt volum eller uregelmessig etterspørsel bør prognosene suppleres med manuell vurdering, da alle modeller viser høyere prognosefeil i denne gruppen.
 
 # Konklusjon
 
 Denne studien har undersøkt hvilken prognosemodell som gir høyest prediksjonsnøyaktighet for månedlige leveranser av farmasøytiske varelinjer i et sentrallager–grossist-system. Fire modeller ble sammenlignet på et datasett bestående av 105 varelinjer over 48 måneder: naiv prognose, Holt-Winters eksponentiell glatting, ARIMA og XGBoost.
 
-Resultatene viser at *[modell X]* gir høyest samlet prognosepresisjon målt ved RMSE, MAE og MAPE, med en median MAPE på *[X] %* i testperioden. *[Modell Y]* presterer *[bedre / dårligere]* enn forventet basert på eksisterende litteratur, noe som diskuteres i lys av datasettets egenskaper og studiens metodiske forutsetninger.
+Resultatene viser at XGBoost gir høyest samlet prognosepresisjon målt ved alle tre feilmål — RMSE (757,23), MAE (654,94) og MAPE (51,97 %) — i testperioden januar til desember 2025. ARIMA presterer bedre enn Holt-Winters på RMSE og MAPE, men forskjellen er ikke statistisk signifikant (DM = 1,508, p = 0,132). Alle modeller forbedrer seg over den naive referanseprognosen, som hadde en median MAPE på 67,50 %.
 
-Analysen viser videre at modellenes relative prestasjon varierer med dataseriens egenskaper. Varelinjer med tydelig sesongmønster gir generelt lavere prognosefeil på tvers av alle modeller, og *[modell X]* er særlig godt egnet for slike serier. For varelinjer med lavt volum eller uregelmessig etterspørsel er presisjonen lavere, og forskjellene mellom modellene er mindre entydige.
+Analysen viser at XGBoost, implementert som en global modell trent på alle 105 SKU-er, utnytter mønstre på tvers av produktporteføljen på en måte de individuelle tidsseriemodellene ikke gjør. Forbedringen over Holt-Winters er på om lag 10,5 prosentpoeng i MAPE, noe som er praktisk relevant, men som bør veies mot den økte implementeringskompleksiteten.
 
-Diebold-Mariano-testen viser at forskjellen mellom Holt-Winters og ARIMA *[er / ikke er]* statistisk signifikant, noe som *[styrker / svekker]* grunnlaget for å foretrekke én av disse modellene fremfor den andre i praksis.
+Diebold-Mariano-testen viser ingen statistisk signifikant forskjell mellom Holt-Winters og ARIMA, noe som svekker grunnlaget for å foretrekke den mer komplekse ARIMA-modellen i operativ planlegging.
 
-Studien bidrar til den eksisterende forskningen ved å analysere prognosemetoder på reelle distribusjonsdata fra farmasøytisk sektor, og underbygger *[eller: utfordrer]* konklusjonen fra Fourkiotis og Tsadiras (2024) om at maskinlæringsmetoder gir marginal eller ingen forbedring over klassiske statistiske modeller når tidsseriene er korte og sesongstrukturen er stabil.
+Studien bidrar til den eksisterende forskningen ved å analysere prognosemetoder på reelle distribusjonsdata fra farmasøytisk sektor med 105 SKU-er og 48 måneder. Funnene støtter Fourkiotis og Tsadiras (2024), som viser at maskinlæringsmetoder som XGBoost gir lavere prognosefeil enn klassiske statistiske modeller på farmasøytiske data, men bekrefter samtidig at klassiske modeller som Holt-Winters gir akseptabel presisjon til en langt lavere implementeringskostnad.
 
 ## 10.1 Videre forskning
 
