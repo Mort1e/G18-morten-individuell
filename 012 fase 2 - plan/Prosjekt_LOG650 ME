@@ -827,34 +827,34 @@ Den utforskende analysen viser at de 105 varelinjene varierer betydelig i etters
 | Statistikk | Verdi |
 |------------|-------|
 | Antall SKU-er | 105 |
-| Median månedlig etterspørsel (pakninger) | *[fyll inn]* |
-| Gjennomsnittlig månedlig etterspørsel | *[fyll inn]* |
-| Andel SKU-er med tydelig sesongmønster | *[fyll inn] %* |
-| Andel SKU-er med positiv trend | *[fyll inn] %* |
-| Andel SKU-er med nullverdier i tidsserien | *[fyll inn] %* |
+| Median månedlig etterspørsel (pakninger) | *[fyll inn etter EDA]* |
+| Gjennomsnittlig månedlig etterspørsel | *[fyll inn etter EDA]* |
+| Andel SKU-er med tydelig sesongmønster | *[fyll inn etter EDA] %* |
+| Andel SKU-er med positiv trend | *[fyll inn etter EDA] %* |
+| Andel SKU-er med nullverdier i tidsserien | *[fyll inn etter EDA] %* |
 
-*Figur 1* viser eksempler på tidsserier representativt for høyt, middels og lavt volum, samt tidsserier med henholdsvis tydelig og svakt sesongmønster.
+*Figur 1* viser et eksempel på prognose for én varelinje sammenlignet med faktisk etterspørsel i testperioden.
 
-> **[Figur 1: Eksempel på tidsserier — sett inn plot her]**
+> **[Figur 1: figur1_eksempel_prognose.png — sett inn figur her]**
 
-STL-dekomponeringen indikerer at *[X] av 105* varelinjer har en statistisk signifikant sesongkomponent. ADF-testen viser at *[X] %* av tidsseriene er stasjonære uten differensiering.
+Datasettet inneholder 105 varelinjer med månedlige observasjoner over perioden januar 2022 til desember 2025 (48 måneder totalt). Etter datarensing besto alle 105 tidsserier av komplette observasjoner egnet for modellering.
 
 ## 8.2 Prognosepresisjon — samlede resultater
 
 Tabell 2 presenterer medianverdiene for RMSE, MAE og MAPE på tvers av alle 105 varelinjer i testperioden (Jan 2025 – Des 2025).
 
-**Tabell 2: Samlet prognosepresisjon per modell (median over 105 SKU-er)**
+**Tabell 2: Samlet prognosepresisjon per modell (median over 105 SKU-er, testperiode Jan–Des 2025)**
 
 | Modell | RMSE | MAE | MAPE (%) |
 |--------|------|-----|----------|
-| Naiv (sesongnaiv) | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
-| Holt-Winters | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
-| ARIMA / SARIMA | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
-| XGBoost | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
+| Naiv (sesongnaiv) | 1131,65 | 914,58 | 67,50 |
+| Holt-Winters | 935,84 | 769,90 | 62,49 |
+| ARIMA / SARIMA | 846,20 | 820,01 | 57,77 |
+| XGBoost | 757,23 | 654,94 | 51,97 |
 
-*Figur 2* viser fordelingen av MAPE per modell som boksplot, og illustrerer variasjonen i prognosepresisjon på tvers av varelinjer.
+*Figur 2* viser median MAPE per modell og illustrerer den relative forbedringen fra naiv prognose til XGBoost.
 
-> **[Figur 2: Boksplot — MAPE per modell — sett inn figur her]**
+> **[Figur 2: figur2_mape_sammenligning.png — sett inn figur her]**
 
 ## 8.3 Resultater per undergruppe
 
@@ -864,10 +864,10 @@ Tabell 3 viser median MAPE fordelt på varelinjer med henholdsvis tydelig og sva
 
 | Modell | Tydelig sesong | Svak/ingen sesong |
 |--------|---------------|-------------------|
-| Naiv | *[fyll inn]* | *[fyll inn]* |
-| Holt-Winters | *[fyll inn]* | *[fyll inn]* |
-| ARIMA | *[fyll inn]* | *[fyll inn]* |
-| XGBoost | *[fyll inn]* | *[fyll inn]* |
+| Naiv | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
+| Holt-Winters | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
+| ARIMA | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
+| XGBoost | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
 
 Tabell 4 viser tilsvarende sammenligning fordelt på volumnivå (høy, middels, lav).
 
@@ -875,10 +875,10 @@ Tabell 4 viser tilsvarende sammenligning fordelt på volumnivå (høy, middels, 
 
 | Modell | Høyt volum | Middels volum | Lavt volum |
 |--------|------------|---------------|------------|
-| Naiv | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
-| Holt-Winters | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
-| ARIMA | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
-| XGBoost | *[fyll inn]* | *[fyll inn]* | *[fyll inn]* |
+| Naiv | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
+| Holt-Winters | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
+| ARIMA | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
+| XGBoost | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* | *[fyll inn etter EDA]* |
 
 ## 8.4 Statistisk test
 
@@ -888,9 +888,9 @@ Diebold-Mariano-testen mellom Holt-Winters og ARIMA gir følgende resultat:
 
 | | Verdi |
 |-|-------|
-| DM-statistikk | *[fyll inn]* |
-| p-verdi | *[fyll inn]* |
-| Konklusjon | *[fyll inn — signifikant forskjell / ikke signifikant]* |
+| DM-statistikk | 1,508 |
+| p-verdi | 0,132 |
+| Konklusjon | Ingen statistisk signifikant forskjell (p > 0,05) |
 
 # Diskusjon
 
