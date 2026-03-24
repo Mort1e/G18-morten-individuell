@@ -39,7 +39,7 @@ ivareta konfidensialitet.
 **Datagrunnlag**
 
 Datagrunnlaget består av anonymiserte, månedlige volumdata for 105
-varelinjer over en periode på 36 måneder. Tallene representerer antall
+varelinjer over en periode på 48 måneder. Tallene representerer antall
 pakninger levert fra sentrallager til grossister og gir et realistisk
 bilde av faktisk logistisk etterspørsel.
 
@@ -116,7 +116,7 @@ praktisk nytte, og dette vil bli diskutert i prosjektet.
 
 Oppgaven avgrenses til analyse av anonymiserte, månedlige volumdata for
 utvalgte varelinjer levert fra sentrallager til grossister over en
-periode på 36 måneder. Analysen fokuserer på kortsiktige
+periode på 48 måneder. Analysen fokuserer på kortsiktige
 etterspørselsprognoser ved bruk av naive prognoser og Holt--Winters som
 hovedmetode, supplert med én KI-basert metode som
 sammenligningsgrunnlag.
@@ -151,7 +151,7 @@ Innhold
 
 [4.0 Casebeskrivelse [4](#casebeskrivelse)](#casebeskrivelse)
 
-[5.0 Metode og data (kan splittes i to)
+[5.0 Metode og data
 [4](#_Toc222057411)](#_Toc222057411)
 
 [5.1 Metode [4](#metode-vent-med-denne)](#metode-vent-med-denne)
@@ -231,7 +231,7 @@ problemstilling:
 
 **Hvilken prognosemodell gir høyest prediksjonsnøyaktighet for månedlige
 leveranser av farmasøytiske varelinjer i et
-sentrallager--grossist-system, gitt et datasett på 36 måneder og 105
+sentrallager--grossist-system, gitt et datasett på 48 måneder og 105
 produkter?**
 
 For å besvare problemstillingen sammenlignes tre prognosemodeller:
@@ -259,8 +259,7 @@ Datasett: Studien benytter kun historiske leveransedata (månedlig
 volum). Eksterne forklaringsvariabler som pris, kampanjer, demografi
 eller regulatoriske utfordringer inkluderes ikke.
 
-Tidsperiode: Analysen omfatter 36 måneder. Lengre historikk er ikke
-tilgjengelig og vurderes derfor ikke.
+Tidsperiode: Datasettet dekker totalt 48 måneder (januar 2022 – desember 2025), hvorav 36 måneder benyttes som treningssett og 12 måneder som testsett. Lengre historikk er ikke tilgjengelig og vurderes derfor ikke.
 
 Horisont: Fokus er på kort- til mellomlangsiktig prognose relevant for
 lager- og produksjonsplanlegging.
@@ -298,7 +297,7 @@ bestillingsatferd snarere enn reell sluttkundedemand.
 Antagelse 2: Stabile data i tid
 
 Trend- og sesongkomponenter antas å være relativt stabile i
-analyseperioden på 36 måneder. Både klassiske tidsseriemodeller som
+treningsperioden på 36 måneder. Både klassiske tidsseriemodeller som
 Holt--Winters og ARIMA bygger på antagelsen om at historiske mønstre i
 dataene inneholder informasjon om fremtidige observasjoner (Hyndman &
 Athanasopoulos, 2021). Dersom dataserien inneholder strukturelle brudd
@@ -406,7 +405,7 @@ metode for å undersøke om en mer datadrevet modell gir bedre
 prognosepresisjon enn de tradisjonelle modellene.
 
 Studien bidrar dermed til den eksisterende forskningen ved å analysere
-reelle logistikkdata fra 105 varelinjer over en periode på 36 måneder.
+reelle logistikkdata fra 105 varelinjer over en periode på 48 måneder.
 Samtidig adresserer den et praktisk relevant spørsmål innen operativ
 etterspørselsplanlegging: om økt modellkompleksitet faktisk gir bedre
 prognoser i en distribusjonskontekst med relativt begrenset historisk
@@ -499,7 +498,7 @@ etterspørselen påvirkes av flere produkter eller ulike nivåer i
 forsyningskjeden. Zhu et al. (2021) viser at maskinlæringsmodeller kan
 forbedre prognosenøyaktigheten når informasjon fra flere relaterte
 tidsserier analyseres samlet. Dette er særlig relevant i situasjoner der
-datamengden per produkt er begrense
+datamengden per produkt er begrenset.
 
 **Uenigheter i forskningen**
 
@@ -558,7 +557,7 @@ risiko for mangelsituasjoner, eller for høye lagernivåer, noe som kan gi
 
 Datagrunnlaget som benyttes i denne studien består av månedlige
 leveranser fra sentrallageret til grossister i Norge. Datasettet
-omfatter 105 varelinjer over en periode på 36 måneder og representerer
+omfatter 105 varelinjer over en periode på 48 måneder og representerer
 derfor et realistisk bilde av etterspørselen som virksomheten må
 planlegge for. Leveransene til grossistene fungerer i denne sammenhengen
 som et mål på etterspørselen i markedet.
@@ -583,47 +582,29 @@ Formålet er dermed å analysere hvorvidt mer avanserte prognosemetoder
 gir bedre prediksjoner enn enklere modeller i en praktisk
 distribusjonskontekst med relativt begrenset historisk datagrunnlag.
 
-[]{#_Toc222057411 .anchor}Metode og data (kan splittes i to)
+# Metode
 
-Litt avhengig av omfanget, kan det være lurt å vurdere om du skal
-splitte kapittelet i to eller ikke.
+Studien er gjennomført som en kvantitativ casestudie basert på historiske leveransedata fra én virksomhet. Formålet er å sammenligne prognosepresisjon på tvers av fire modeller ved bruk av identiske data og evalueringsmetoder.
 
-# Metode (Vent med denne)
+**Forskningsdesign**
 
-I oppgavens metodedel skal du beskrive valgt metode. Dette skal
-beskrives så nøyaktig at andre skal kunne klare å gjenta prosessen.
-Metodedelen gir leseren mulighet til å vurdere hvorvidt oppgaven kan
-inneholde feil i fremgangsmåten.
+Studien følger et komparativt evalueringsdesign der fire prognosemodeller — naiv, Holt-Winters, ARIMA og XGBoost — sammenlignes på det samme datasettet under identiske betingelser. Designet er i tråd med standard evalueringspraksis i tidsserieprognostisering, der modeller evalueres ved hjelp av felles feilmål og hold-out-validering (Hyndman & Athanasopoulos, 2021).
 
-Oppgi paradigme betraktninger, forskningsperspektiv, forskningsdesign,
-innsamlingsmetode for data, utvalgskriterier, utvalgsmetode,
-utvalgsstørrelse og analysemetoder.
+**Kvantitativ metode**
 
-Du kan også ta opp eventuelle etiske spørsmål og potensielle feilkilder.
+Studien er utelukkende kvantitativ og baserer seg på numeriske leveransedata. Det er ikke gjennomført intervjuer, spørreundersøkelser eller kvalitativ analyse. Datagrunnlaget er hentet fra virksomhetens ERP-system og analysert ved hjelp av statistiske og maskinlæringsbaserte modeller.
 
-Eksempel:
+**Analyseverktøy**
 
-Hvilken forskningsmetode er valgt?
+Analysen er gjennomført i Python ved bruk av bibliotekene `statsmodels`, `pmdarima`, `xgboost`, `pandas`, `numpy`, `matplotlib` og `scikit-learn`. Python er valgt fordi det gir fri tilgang til oppdaterte implementasjoner av alle fire modellene, og fordi analysekoden kan gjøres transparent og reproduserbar.
 
-For de fleste er det case-metode
+**Etiske betraktninger**
 
-Kvantitativ eller kvalitativ?
+Datasettet er anonymisert av studenten i tråd med virksomhetens retningslinjer for bruk av data i KI-verktøy og akademisk forskning. Anonymiseringen sikrer at hverken produktidentitet eller bedriftsinformasjon kan identifiseres av tredjeparter.
 
-Hva slags data (spørreskjema, intervju, fra ERP systemet)
+**Potensielle feilkilder**
 
-Teori rundt det å lage spørreskjema
-
-Teori rundt det med nøyaktigheten av data fra ERP system
-
-Metode for analyse, kvantitativ, kvalitativ
-
-Kort beskrivelse av den metoden som er valgt
-
-Statistisk metode? regresjon?
-
-Kort beskrivelse (bruk lærebøker)
-
-Dataverktøy for eksempel SPSS eller excel
+De viktigste feilkildene er diskutert i avsnitt 9.4. De mest sentrale er: (1) leveranser til grossister som proxy for sluttetterspørsel, (2) asymmetri mellom individuell modellering (Holt-Winters/ARIMA) og global modellering (XGBoost), og (3) begrenset datamengde for maskinlæringsformål.
 
 # Data
 
@@ -910,7 +891,7 @@ Svaret på problemstillingen er dermed at XGBoost gir høyest prediksjonsnøyakt
 
 Resultatene støtter eksisterende forskning på feltet.
 
-Fourkiotis og Tsadiras (2024) finner at XGBoost typisk gir lavere prognosefeil enn tradisjonelle statistiske modeller på farmasøytiske salgsdata. Dette er konsistent med funnene i denne studien, der XGBoost gir en MAPE-forbedring på 10,52 prosentpoeng sammenlignet med den naive prognosen og 10,52 prosentpoeng over Holt-Winters. Forbedringen er imidlertid moderat, og de klassiske modellene (Holt-Winters og ARIMA) presterer fortsatt vesentlig bedre enn referansenivået.
+Fourkiotis og Tsadiras (2024) finner at XGBoost typisk gir lavere prognosefeil enn tradisjonelle statistiske modeller på farmasøytiske salgsdata. Dette er konsistent med funnene i denne studien, der XGBoost gir en MAPE-forbedring på 15,53 prosentpoeng sammenlignet med den naive prognosen og 10,52 prosentpoeng over Holt-Winters. Forbedringen er imidlertid moderat, og de klassiske modellene (Holt-Winters og ARIMA) presterer fortsatt vesentlig bedre enn referansenivået.
 
 Burinskiene (2022) påpeker at datakvalitet og struktureringsnivå er like viktig som modellvalg. Dette er relevant for forståelsen av hvorfor Holt-Winters og ARIMA yter relativt godt på dette datasettet: leveransedataene fra et sentrallager-grossist-system har en relativt stabil struktur med begrenset støy, noe som favoriserer klassiske tidsseriemodeller.
 
@@ -970,9 +951,8 @@ Denne studien reiser flere spørsmål som kan være utgangspunkt for videre fors
 
 # Bibliografi
 
-# Vedlegg
-
-Referanseliste:
+Box, G. E. P., Jenkins, G. M., Reinsel, G. C., & Ljung, G. M. (2015).
+*Time series analysis: Forecasting and control* (5th ed.). Wiley.
 
 Burinskiene, A. (2022). Forecasting model: The case of the
 pharmaceutical retail. *Frontiers in Medicine, 9*, 582186.
@@ -982,6 +962,10 @@ Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting
 system. In *Proceedings of the 22nd ACM SIGKDD International Conference
 on Knowledge Discovery and Data Mining* (pp. 785--794). Association for
 Computing Machinery. <https://doi.org/10.1145/2939672.2939785>
+
+Diebold, F. X., & Mariano, R. S. (1995). Comparing predictive accuracy.
+*Journal of Business & Economic Statistics, 13*(3), 253--263.
+<https://doi.org/10.1080/07350015.1995.10524599>
 
 Fourkiotis, K. P., & Tsadiras, A. K. (2024). Applying machine learning
 and statistical forecasting methods for enhancing pharmaceutical sales
@@ -994,26 +978,6 @@ and practice* (3rd ed.). OTexts. <https://otexts.com/fpp3/>
 Lov om apotek (apotekloven). (2000). *Lov om apotek
 (LOV-2000-06-02-39).* <https://lovdata.no/dokument/NL/lov/2000-06-02-39>
 
-Box, G. E. P., Jenkins, G. M., Reinsel, G. C., & Ljung, G. M. (2015).
-*Time series analysis: Forecasting and control* (5th ed.). Wiley.
-
-Burinskiene, A. (2022). Forecasting model: The case of the
-pharmaceutical retail. *Frontiers in Medicine, 9*, 582186.
-https://doi.org/10.3389/fmed.2020.582186
-
-Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting
-system. In *Proceedings of the 22nd ACM SIGKDD International Conference
-on Knowledge Discovery and Data Mining* (pp. 785--794). Association for
-Computing Machinery. <https://doi.org/10.1145/2939672.2939785>
-
-Fourkiotis, K. P., & Tsadiras, A. K. (2024). Applying machine learning
-and statistical forecasting methods for enhancing pharmaceutical sales
-predictions. *Forecasting, 6*(1), 170--186.
-<https://doi.org/10.3390/forecast6010010>
-
-Hyndman, R. J., & Athanasopoulos, G. (2021). *Forecasting: Principles
-and practice* (3rd ed.). OTexts. <https://otexts.com/fpp3/>
-
 Petropoulos, F., Spiliotis, E., & Assimakopoulos, V. (2022).
 Forecasting: Theory and practice. *International Journal of Forecasting,
 38*(3), 705--871. <https://doi.org/10.1016/j.ijforecast.2021.11.001>
@@ -1021,4 +985,6 @@ Forecasting: Theory and practice. *International Journal of Forecasting,
 Zhu, X., Ninh, A., Zhao, H., & Liu, Z. (2021). Demand forecasting with
 supply chain information and machine learning: Evidence in the
 pharmaceutical industry. *Production and Operations Management, 30*(10),
-3231--3252. https://doi.org/10.1111/poms.13458
+3231--3252. <https://doi.org/10.1111/poms.13458>
+
+# Vedlegg
