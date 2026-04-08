@@ -259,27 +259,34 @@ def plot_mape_boxplot(results, output_dir):
     plt.close()
     print(f"Figur lagret: {output_dir}/figur2_mape_boxplot.png")
 
-def plot_example_forecasts(df, output_dir):
-    """Plott prognose vs. faktisk for én eksempel-SKU."""
+def plot_example_forecasts(df, output_dir, xgb_model=None):
+    """Plott prognose vs. faktisk for én eksempel-SKU — alle fire modeller."""
     sku = df.index[1]  # Velg andre SKU som eksempel
     series = df.loc[sku].values.astype(float)
     train  = series[:TRAIN_END]
     actual = series[TRAIN_END:TRAIN_END + TEST_PERIODS]
 
-    hw_pred    = holtwinters_forecast(train)
     naive_pred = naive_forecast(train)
+    hw_pred    = holtwinters_forecast(train)
+    arima_pred = arima_forecast(train)
+    xgb_pred   = predict_xgboost_sku(xgb_model, train) if xgb_model is not None else None
 
     months_train = pd.date_range("2022-01", periods=TRAIN_END, freq="MS")
     months_test  = pd.date_range("2025-01", periods=TEST_PERIODS, freq="MS")
+    split_date   = pd.Timestamp("2025-01-01")
 
     fig, ax = plt.subplots(figsize=(12, 5))
-    ax.plot(months_train, train, label="Historisk", color="black")
-    ax.plot(months_test, actual, label="Faktisk (test)", color="black", linestyle="--")
-    ax.plot(months_test, hw_pred[:TEST_PERIODS], label="Holt-Winters", color="steelblue")
-    ax.plot(months_test, naive_pred, label="Naiv", color="gray", linestyle=":")
+    ax.plot(months_train, train,  label="Historisk (2022–2024)", color="black", linewidth=1.5)
+    ax.plot(months_test,  actual, label="Faktisk (2025)",        color="black", linestyle="--", linewidth=1.5)
+    ax.plot(months_test,  naive_pred,              label="Naiv",         color="gray",       linestyle=":",  linewidth=1.5)
+    ax.plot(months_test,  hw_pred[:TEST_PERIODS],  label="Holt-Winters", color="steelblue",  linestyle="-",  linewidth=1.5)
+    ax.plot(months_test,  arima_pred[:TEST_PERIODS], label="ARIMA",      color="darkorange", linestyle="-.", linewidth=1.5)
+    if xgb_pred is not None:
+        ax.plot(months_test, xgb_pred[:TEST_PERIODS], label="XGBoost",  color="green",      linestyle="--", linewidth=1.5)
+    ax.axvline(split_date, color="red", linestyle="--", alpha=0.5, linewidth=1.2, label="Train/test-grense")
     ax.set_title(f"Figur 1: Eksempel prognose — SKU {sku}", fontsize=13)
     ax.set_ylabel("Volum (pakninger)")
-    ax.legend()
+    ax.legend(loc="upper left", fontsize=9)
     plt.tight_layout()
     plt.savefig(f"{output_dir}/figur1_eksempel_prognose.png", dpi=150)
     plt.close()
@@ -312,8 +319,9 @@ if __name__ == "__main__":
     run_dm_test(df, results)
 
     print("\nLager visualiseringer...")
+    xgb_model_global = train_xgboost_global(df)
     plot_mape_boxplot(results, OUTPUT_DIR)
-    plot_example_forecasts(df, OUTPUT_DIR)
+    plot_example_forecasts(df, OUTPUT_DIR, xgb_model=xgb_model_global)
 
     print("\nFerdig! Filer produsert:")
     print("  - resultater_sammenligning.csv")
