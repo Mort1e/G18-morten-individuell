@@ -166,10 +166,10 @@ def run_analysis(df):
     xgb_model = train_xgboost_global(df)
 
     results = {
-        "Naiv":         {"RMSE": [], "MAE": [], "MAPE": []},
-        "Holt-Winters": {"RMSE": [], "MAE": [], "MAPE": []},
-        "ARIMA":        {"RMSE": [], "MAE": [], "MAPE": []},
-        "XGBoost":      {"RMSE": [], "MAE": [], "MAPE": []},
+        "Naiv":         {"RMSE": [], "MAE": [], "MAPE": [], "preds": [], "actuals": []},
+        "Holt-Winters": {"RMSE": [], "MAE": [], "MAPE": [], "preds": [], "actuals": []},
+        "ARIMA":        {"RMSE": [], "MAE": [], "MAPE": [], "preds": [], "actuals": []},
+        "XGBoost":      {"RMSE": [], "MAE": [], "MAPE": [], "preds": [], "actuals": []},
     }
 
     n_skus = len(df)
@@ -193,6 +193,8 @@ def run_analysis(df):
             results[model_name]["RMSE"].append(rmse(actual, pred))
             results[model_name]["MAE"].append(mae(actual, pred))
             results[model_name]["MAPE"].append(mape(actual, pred))
+            results[model_name]["preds"].extend(list(pred))
+            results[model_name]["actuals"].extend(list(actual))
 
     return results
 
@@ -215,28 +217,30 @@ def summarize_results(results):
 
 # ── 6. Diebold-Mariano test ────────────────────────────────────────────────────
 def run_dm_test(df, results):
-    """DM-test mellom Holt-Winters og ARIMA over alle SKU-er."""
+    """DM-test: Holt-Winters vs. ARIMA og XGBoost vs. ARIMA (bruker lagrede prognoser)."""
     try:
         from dieboldmariano import dm_test as dm
-        actuals, hw_preds, arima_preds = [], [], []
-        for sku in df.index:
-            series = df.loc[sku].values.astype(float)
-            train  = series[:TRAIN_END]
-            actual = series[TRAIN_END:TRAIN_END + TEST_PERIODS]
-            hw_pred    = holtwinters_forecast(train)
-            arima_pred = arima_forecast(train)
-            actuals.extend(list(actual))
-            hw_preds.extend(list(hw_pred[:TEST_PERIODS]))
-            arima_preds.extend(list(arima_pred[:TEST_PERIODS]))
-        stat, p = dm(actuals, hw_preds, arima_preds, h=1)
-        print(f"\nDiebold-Mariano test (Holt-Winters vs ARIMA):")
-        print(f"  DM-statistikk : {stat:.4f}")
-        print(f"  p-verdi       : {p:.4f}")
-        print(f"  Konklusjon    : {'Signifikant forskjell (p<0.05)' if p < 0.05 else 'Ingen signifikant forskjell'}")
-        return stat, p
+        actuals     = results["ARIMA"]["actuals"]        # Alle modeller har samme faktiske verdier
+        hw_preds    = results["Holt-Winters"]["preds"]
+        arima_preds = results["ARIMA"]["preds"]
+        xgb_preds   = results["XGBoost"]["preds"]
+
+        stat_hw, p_hw = dm(actuals, hw_preds, arima_preds, h=1)
+        print(f"\nDiebold-Mariano test (Holt-Winters vs. ARIMA):")
+        print(f"  DM-statistikk : {stat_hw:.4f}")
+        print(f"  p-verdi       : {p_hw:.4f}")
+        print(f"  Konklusjon    : {'Signifikant forskjell (p<0.05)' if p_hw < 0.05 else 'Ingen signifikant forskjell'}")
+
+        stat_xgb, p_xgb = dm(actuals, xgb_preds, arima_preds, h=1)
+        print(f"\nDiebold-Mariano test (XGBoost vs. ARIMA):")
+        print(f"  DM-statistikk : {stat_xgb:.4f}")
+        print(f"  p-verdi       : {p_xgb:.4f}")
+        print(f"  Konklusjon    : {'Signifikant forskjell (p<0.05)' if p_xgb < 0.05 else 'Ingen signifikant forskjell'}")
+
+        return (stat_hw, p_hw), (stat_xgb, p_xgb)
     except Exception as e:
         print(f"\nDM-test feilet: {e}")
-        return None, None
+        return (None, None), (None, None)
 
 
 # ── 7. Visualiseringer ────────────────────────────────────────────────────────
