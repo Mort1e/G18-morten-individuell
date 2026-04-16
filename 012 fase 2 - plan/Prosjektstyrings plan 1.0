@@ -1,11 +1,11 @@
-# Prosjektstyringsplan [Versjon 2.0]{.mark}
+# Prosjektstyringsplan [Versjon 3.0]{.mark}
 
 **Analyserer av historiske salgsdata for å utvikle en modell for
 månedlig etterspørselsprognose.**
 
 Emne: LOG650 -- Forskningsprosjekt: Logistikk og kunstig intelligens
 
-Dato: 09.03.2026
+Dato: 16.04.2026
 
 Utarbeidet av: Morten Eidsvåg
 
@@ -32,6 +32,11 @@ Bedrift: Importør av legemidler
                          målbare suksesskriterier,
                          RACI-matrise og
                          dataforvaltningsplan lagt til
+
+  3.0       2026-04-16   WBS oppdatert med               —
+                         avkryssingsbokser; milepæl-
+                         status oppdatert; suksess-
+                         kriterium-avvik dokumentert
   -----------------------------------------------------------------------
 
 1 Sammendrag
