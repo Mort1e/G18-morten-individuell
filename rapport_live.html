@@ -24,7 +24,7 @@ sesongprognose, Holt-Winters eksponentiell glatting, ARIMA/SARIMA og
 XGBoost. Modellene trenes på de første 36 månedene og evalueres på de
 siste 12 månedene ved hjelp av feilmålene RMSE, MAE og MAPE (median over
 alle SKU-er).</p>
-<p>Resultatene viser at XGBoost gir lavest samlet prognosefeil (MAPE: 52,19 %; RMSE: 811,24; MAE: 702,95), etterfulgt av ARIMA (MAPE: 57,77 %), Holt-Winters (MAPE: 62,49 %) og naiv prognose (MAPE: 67,50 %). Diebold-Mariano-tester viser ingen statistisk signifikant forskjell mellom Holt-Winters og ARIMA (DM = 1,766, p = 0,078) eller mellom XGBoost og ARIMA (DM = −0,779, p = 0,436). Segmentert analyse viser at XGBoost er særlig overlegen for SKU-er uten tydelig sesongmønster (MAPE: 51,50 %) og for varelinjer med høyt volum (MAPE: 49,46 %), men presterer svakest for SKU-er med tydelig sesongmønster (79,13 %), der ARIMA og Holt-Winters er mer robuste. Det bemerkes at XGBoost er trent som én global modell på alle 105 SKU-er, mens Holt-Winters og ARIMA er tilpasset individuelt per varelinje — en asymmetri som begrenser muligheten til å isolere effekten av modellarkitektur fra effekten av økt treningsvolum.</p>
+<p>Resultatene viser at XGBoost gir lavest samlet prognosefeil (MAPE: 52,19 %; RMSE: 811,24; MAE: 702,95), etterfulgt av ARIMA (MAPE: 57,77 %), Holt-Winters (MAPE: 62,49 %) og naiv prognose (MAPE: 67,50 %). Diebold-Mariano-tester viser ingen statistisk signifikant forskjell mellom Holt-Winters og ARIMA (DM = 1,766, p = 0,078) eller mellom XGBoost og ARIMA (DM = −0,779, p = 0,436). Segmentert analyse viser at XGBoost er klart best for SKU-er uten tydelig sesongmønster (MAPE: 51,50 %) og for varelinjer med høyt volum (MAPE: 49,46 %), men presterer svakest for SKU-er med tydelig sesongmønster (79,13 %), der ARIMA og Holt-Winters er mer robuste. Det bemerkes at XGBoost er trent som én global modell på alle 105 SKU-er, mens Holt-Winters og ARIMA er tilpasset individuelt per varelinje — en asymmetri som begrenser muligheten til å isolere effekten av modellarkitektur fra effekten av økt treningsvolum.</p>
 <p>Studien bidrar med tre funn: (1) XGBoost som global modell gir observert forbedring over klassiske tidsseriemodeller (MAPE 52,19 % mot 62,49 % for Holt-Winters), men DM-testen bekrefter ikke statistisk signifikant forskjell fra ARIMA (p = 0,436), slik at rangordningen bør tolkes som en indikasjon; (2) modellprestasjonene varierer systematisk mellom segmenter — XGBoost er sterkest for ikke-sesongpreget og høyvolumsegmentet, men svakest for sesongpreget produkter, der ARIMA er best; og (3) ingen av de testede modellparene skiller seg signifikant fra hverandre i DM-test. For virksomheter uten avansert analysekapasitet er Holt-Winters et robust alternativ med lav implementeringskostnad.</p>
 <p><strong>Innhold</strong></p>
 <p>1.0 Innledning<br />
@@ -1038,14 +1038,21 @@ produktsegmenter?</em></p>
 </blockquote>
 <p>Resultatene viser at XGBoost gir lavest median MAPE på tvers av de
 105 varelinjene (52,19 %), etterfulgt av ARIMA (57,77 %), Holt-Winters (62,49 %)
-og naiv prognose (67,50 %). XGBoost er overlegen på alle tre feilmål — RMSE (811,24),
+og naiv prognose (67,50 %). XGBoost har lavest verdi på alle tre feilmål — RMSE (811,24),
 MAE (702,95) og MAPE (52,19 %). Alle fire modeller forbedrer seg konsistent over den
 naive referanseprognosen (67,50 %).</p>
-<p>Svaret på problemstillingen er dermed at XGBoost gir høyest prediksjonsnøyaktighet
-under de betingelsene som er analysert i denne studien. Resultatet bør tolkes med
-forbehold: XGBoost er trent som én global modell på alle 105 SKU-er, mens
-Holt-Winters og ARIMA er tilpasset individuelt per varelinje — en asymmetri
-som diskuteres i avsnitt 8.3.</p>
+<p>Svaret på problemstillingen er dermed at XGBoost gir lavest prognosefeil blant de
+fire testede modellene under de betingelsene som er analysert i denne studien.
+Det er imidlertid nødvendig å skille mellom relativ rangordning og absolutt presisjon:
+en median MAPE på 52,19 % innebærer at modellens prediksjon i mediantilfellet avviker
+med over halvparten av faktisk verdi. Dette er ikke høy prediksjonsnøyaktighet i operativ
+forstand — det er den beste relative prestasjonen blant fire modeller på et datasett
+preget av høy variabilitet og lavvolum-dominans. Konklusjonen bør leses som at XGBoost
+er det foretrukne valget blant de alternativene som er testet, ikke som at
+maskinlæringsbasert prognostisering eliminerer etterspørselsusikkerheten for denne typen
+portefølje. Resultatet bør dessuten tolkes med forbehold: XGBoost er trent som én global
+modell på alle 105 SKU-er, mens Holt-Winters og ARIMA er tilpasset individuelt per
+varelinje — en asymmetri som diskuteres i avsnitt 8.3.</p>
 <p>De tre underspørsmålene kan oppsummeres som følger:</p>
 <p><strong>RQ1</strong> besvares bekreftende: XGBoost gir lavest
 prognosefeil på samtlige tre feilmål i testperioden, med median MAPE
@@ -1170,6 +1177,20 @@ fordel, og resultatene bør tolkes i lys av dette metodiske valget.</p>
 <p><strong>Ekstern validitet:</strong> Resultatene gjelder ett
 distribusjonsselskap i én bransje. Overførbarheten til andre bransjer
 eller distribusjonssystemer er begrenset.</p>
+<p><strong>Forhåndsdefinert suksesskriterium ikke oppfylt:</strong>
+Prosjektstyringsplanen definerte et målbart suksesskriterium om at minst
+én modell skulle oppnå median MAPE under 30 % i testperioden. Dette ble
+ikke oppnådd — beste resultat er XGBoost med 52,19 %. Det er grunn til å
+reflektere over dette avviket. Kriteriet ble satt tidlig i prosjektet,
+før den utforskende dataanalysen avdekket at datasettet er dominert av
+lavvolum-SKU-er med høy relativ variasjon og hyppige nullobservasjoner.
+Burinskiene (2022) rapporterer tilsvarende MAPE-nivåer (50–70 %) for
+farmasøytiske datasett med lignende karakteristikk, noe som indikerer at
+30 %-kriteriet var urealistisk gitt disse dataenes natur. Det ikke-oppfylte
+kriteriet bør derfor tolkes som en feilvurdering av datakompleksiteten i
+planfasen, ikke som et tegn på at analysen er mislykket. Suksesskriteriene
+for reproduserbarhet (fast seed, fast split, versjonskontroll) og
+implementering av alle fire modeller er fullt ut oppfylt.</p>
 <h2 id="implikasjoner-for-næringslivet">8.5 Implikasjoner for
 næringslivet</h2>
 <p>For virksomheter i farmasøytisk distribusjon med tilsvarende
@@ -1196,7 +1217,8 @@ anonymisert datasett med 105 farmasøytiske varelinjer over 48 måneder,
 med treningssett 2022–2024 og testperiode januar–desember 2025.</p>
 <p>De tre underspørsmålene besvares som følger. <strong>RQ1</strong>:
 XGBoost gir lavest prognosefeil på samtlige tre feilmål — RMSE (811,24),
-MAE (702,95) og MAPE (52,19 %) — og er den beste modellen i testperioden.
+MAE (702,95) og MAPE (52,19 %) — og rangerer høyest blant de fire testede modellene
+i testperioden, selv om absoluttnivåene er høye.
 ARIMA (MAPE 57,77 %) og Holt-Winters (MAPE 62,49 %) presterer begge
 klart bedre enn den naive referansen (MAPE 67,50 %).
 <strong>RQ2</strong>: Modellprestasjonene varierer tydelig mellom segmenter.

@@ -275,84 +275,84 @@ analyse og diskusjon av praktiske implikasjoner for logistikkplanlegging.
 
 **Fase 1**
 
-1\. Initiering
+- [x] 1\. Initiering
 
-> 1.1 Definere prosjektidé\
-> 1.2 Avklare problemstilling\
-> 1.3 Identifisere datagrunnlag\
-> 1.4 Gjennomføre innledende litteratursøk\
-> 1.5 Avklare metodisk tilnærming\
-> 1.6 Utarbeide proposal\
-> 1.7 Innlevering av proposal
+  - [x] 1.1 Definere prosjektidé
+  - [x] 1.2 Avklare problemstilling
+  - [x] 1.3 Identifisere datagrunnlag
+  - [x] 1.4 Gjennomføre innledende litteratursøk
+  - [x] 1.5 Avklare metodisk tilnærming
+  - [x] 1.6 Utarbeide proposal
+  - [x] 1.7 Innlevering av proposal
 
 **Fase 2**
 
-2\. Planlegging
+- [x] 2\. Planlegging
 
-2.1 Etablere prosjektplan
+  - [x] 2.1 Etablere prosjektplan
 
-> 2.1.1 Definere prosjektomfang\
-> 2.1.2 Definere prosjektmål\
-> 2.1.3 Avklare avgrensninger
+    - [x] 2.1.1 Definere prosjektomfang
+    - [x] 2.1.2 Definere prosjektmål
+    - [x] 2.1.3 Avklare avgrensninger
 
-2.2 Planlegge analysearbeid
+  - [x] 2.2 Planlegge analysearbeid
 
-> 2.2.1 Strukturere datagrunnlag\
-> 2.2.2 Velge prognosemetoder\
-> 2.2.3 Definere evalueringsmetoder
+    - [x] 2.2.1 Strukturere datagrunnlag
+    - [x] 2.2.2 Velge prognosemetoder
+    - [x] 2.2.3 Definere evalueringsmetoder
 
-2.3 Planlegge fremdrift
+  - [x] 2.3 Planlegge fremdrift
 
-> 2.3.1 Lage arbeidsnedbrytningsstruktur\
-> 2.3.2 Lage Gantt-plan\
-> 2.3.3 Definere milepæler
+    - [x] 2.3.1 Lage arbeidsnedbrytningsstruktur
+    - [x] 2.3.2 Lage Gantt-plan
+    - [x] 2.3.3 Definere milepæler
 
-2.4 Godkjenning av prosjektplan
+  - [x] 2.4 Godkjenning av prosjektplan
 
 **Fase 3**
 
-3\. Gjennomføring
+- [x] 3\. Gjennomføring
 
-3.1 Databehandling
+  - [x] 3.1 Databehandling
 
-> 3.1.1 Importere datasett\
-> 3.1.2 Rense og strukturere data\
-> 3.1.3 Kontrollere datakvalitet
+    - [x] 3.1.1 Importere datasett
+    - [x] 3.1.2 Rense og strukturere data
+    - [x] 3.1.3 Kontrollere datakvalitet
 
-3.2 Utforskende analyse
+  - [x] 3.2 Utforskende analyse
 
-> 3.2.1 Visualisere salgsutvikling\
-> 3.2.2 Analysere trend\
-> 3.2.3 Analysere sesongvariasjoner
+    - [x] 3.2.1 Visualisere salgsutvikling
+    - [x] 3.2.2 Analysere trend
+    - [x] 3.2.3 Analysere sesongvariasjoner
 
-3.3 Prognosemodeller
+  - [x] 3.3 Prognosemodeller
 
-> 3.3.1 Implementere Holt-Winters modell\
-> 3.3.2 Implementere ARIMA modell\
-> 3.3.3 Implementere XGBoost modell
+    - [x] 3.3.1 Implementere Holt-Winters modell
+    - [x] 3.3.2 Implementere ARIMA modell
+    - [x] 3.3.3 Implementere XGBoost modell
 
-3.4 Modellanalyse
+  - [x] 3.4 Modellanalyse
 
-> 3.4.1 Beregne prognosefeil\
-> 3.4.2 Sammenligne modellresultater\
-> 3.4.3 Tolke resultatene
+    - [x] 3.4.1 Beregne prognosefeil
+    - [x] 3.4.2 Sammenligne modellresultater
+    - [x] 3.4.3 Tolke resultatene
 
-3.5 Rapportarbeid
+  - [x] 3.5 Rapportarbeid
 
-> 3.5.1 Skrive metodekapittel\
-> 3.5.2 Skrive resultatkapittel\
-> 3.5.3 Skrive diskusjon
+    - [x] 3.5.1 Skrive metodekapittel
+    - [x] 3.5.2 Skrive resultatkapittel
+    - [x] 3.5.3 Skrive diskusjon
 
 **Fase 4**
 
-4\. Avslutning
+- [ ] 4\. Avslutning
 
-> 4.1 Revidere rapport etter tilbakemeldinger\
-> 4.2 Ferdigstille analyse og figurer\
-> 4.3 Kvalitetssikre referanser og metode\
-> 4.4 Ferdigstille sluttrapport\
-> 4.5 Utarbeide presentasjon\
-> 4.6 Endelig innlevering
+  - [ ] 4.1 Revidere rapport etter tilbakemeldinger
+  - [ ] 4.2 Ferdigstille analyse og figurer
+  - [ ] 4.3 Kvalitetssikre referanser og metode
+  - [ ] 4.4 Ferdigstille sluttrapport
+  - [ ] 4.5 Utarbeide presentasjon
+  - [ ] 4.6 Endelig innlevering
 
 3.0 Fremdrift
 
