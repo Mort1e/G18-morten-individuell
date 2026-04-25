@@ -371,6 +371,73 @@ def predict_xgboost_sku(model, train_series):
     return np.array(preds)
 
 
+# ── 5b. XGBoost individuell per SKU ───────────────────────────────────────────
+def run_xgboost_individual(df, best_params=None):
+    """
+    Trener én XGBoost-modell per SKU (105 modeller) med samme 36 treningsobservasjoner
+    som HW og ARIMA. Kontrolleksperiment for å isolere pooling-effekten fra
+    global XGBoost (jf. avsnitt 8.3 og 8.4 i rapporten).
+    """
+    if best_params is None:
+        best_params = {"n_estimators": 300, "learning_rate": 0.05, "max_depth": 4}
+
+    print("\nKjører XGBoost individuell per SKU...")
+    max_lag = max(XGB_LAGS)
+    n_train_feats = TRAIN_END - max_lag  # typisk 36 - 12 = 24 treningsrader per SKU
+
+    rmse_list, mae_list, mape_list = [], [], []
+    sku_records = []
+
+    for i, sku in enumerate(df.index):
+        if (i + 1) % 20 == 0:
+            print(f"  SKU {i+1}/{len(df.index)}...")
+
+        series = df.loc[sku].values.astype(float)
+
+        feat_df = build_xgboost_features(series, lags=XGB_LAGS)
+        X_train = feat_df.iloc[:n_train_feats].drop("target", axis=1).values
+        y_train = feat_df.iloc[:n_train_feats]["target"].values
+        X_test  = feat_df.iloc[n_train_feats:n_train_feats + TEST_PERIODS].drop("target", axis=1).values
+        y_test  = feat_df.iloc[n_train_feats:n_train_feats + TEST_PERIODS]["target"].values
+
+        if len(X_train) < 5 or len(X_test) == 0:
+            rmse_list.append(np.nan)
+            mae_list.append(np.nan)
+            mape_list.append(np.nan)
+            sku_records.append({"SKU": sku, "RMSE": None, "MAE": None, "MAPE": None})
+            continue
+
+        model = xgb.XGBRegressor(
+            **best_params,
+            subsample=0.8,
+            colsample_bytree=0.8,
+            random_state=RANDOM_SEED,
+            verbosity=0,
+        )
+        model.fit(X_train, y_train)
+        preds = np.maximum(0.0, model.predict(X_test))
+
+        r = rmse(y_test, preds)
+        m = mae_metric(y_test, preds)
+        p = mape_metric(y_test, preds)
+
+        rmse_list.append(r)
+        mae_list.append(m)
+        mape_list.append(p)
+        sku_records.append({"SKU": sku, "RMSE": round(r, 4), "MAE": round(m, 4), "MAPE": round(p, 4) if p is not None else None})
+
+    ind_df = pd.DataFrame(sku_records)
+    ind_df.to_csv(f"{OUTPUT_DIR}/resultater_xgboost_individuell.csv", index=False)
+
+    mape_vals = [v for v in mape_list if not np.isnan(v)]
+    print(f"  Median RMSE : {np.median([v for v in rmse_list if not np.isnan(v)]):.2f}")
+    print(f"  Median MAE  : {np.median([v for v in mae_list  if not np.isnan(v)]):.2f}")
+    print(f"  Median MAPE : {np.median(mape_vals):.2f}%  (n={len(mape_vals)} SKU-er)")
+    print(f"  Lagret: resultater_xgboost_individuell.csv")
+
+    return {"RMSE": rmse_list, "MAE": mae_list, "MAPE": mape_list, "preds": [], "actuals": []}
+
+
 # ── 6. Kjør alle modeller ──────────────────────────────────────────────────────
 def run_analysis(df, xgb_model, eda_df):
     print("\nKjører modeller (dette tar noen minutter for ARIMA)...")
@@ -526,22 +593,23 @@ def run_dm_test(results):
 # ── 10. Visualiseringer ────────────────────────────────────────────────────────
 def plot_mape_sammenligning(results, output_dir):
     """Stolpediagram: median MAPE per modell — brukes som Figur 2 i rapporten."""
-    models = ["Naiv", "Holt-Winters", "ARIMA", "XGBoost"]
-    colors = ["#aaaaaa", "#5b9bd5", "#ed7d31", "#70ad47"]
+    models = ["Naiv", "Holt-Winters", "XGBoost (individuell)", "ARIMA", "XGBoost"]
+    labels = ["Naiv", "Holt-Winters", "XGBoost\n(individuell)", "ARIMA", "XGBoost\n(global)"]
+    colors = ["#aaaaaa", "#5b9bd5", "#9dc3e6", "#ed7d31", "#70ad47"]
     medians = []
     for m in models:
         vals = [v for v in results[m]["MAPE"] if not np.isnan(v)]
         medians.append(np.median(vals))
 
-    fig, ax = plt.subplots(figsize=(9, 5))
-    bars = ax.bar(models, medians, color=colors, edgecolor="white", linewidth=0.8)
+    fig, ax = plt.subplots(figsize=(11, 5))
+    bars = ax.bar(labels, medians, color=colors, edgecolor="white", linewidth=0.8)
     for bar, val in zip(bars, medians):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.8,
-                f"{val:.1f} %", ha="center", va="bottom", fontsize=11, fontweight="bold")
+                f"{val:.1f} %", ha="center", va="bottom", fontsize=10, fontweight="bold")
     ax.set_title("Figur 2: Median MAPE per modell (alle 105 SKU-er, testperiode Jan\u2013Des 2025)",
                  fontsize=12)
     ax.set_ylabel("Median MAPE (%)")
-    ax.set_ylim(0, max(medians) * 1.15)
+    ax.set_ylim(0, max(medians) * 1.18)
     ax.axhline(medians[0], color="gray", linestyle="--", linewidth=0.8, alpha=0.6, label="Naiv referanse")
     ax.legend(fontsize=9)
     plt.tight_layout()
@@ -550,18 +618,22 @@ def plot_mape_sammenligning(results, output_dir):
     print(f"  Lagret: figur2_mape_sammenligning.png")
 
 def plot_mape_boxplot(results, output_dir):
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(11, 6))
+    model_keys   = ["Naiv", "Holt-Winters", "XGBoost (individuell)", "ARIMA", "XGBoost"]
+    model_labels = ["Naiv", "Holt-Winters", "XGBoost\n(individuell)", "ARIMA", "XGBoost\n(global)"]
     data = [
         [v for v in results[m]["MAPE"] if not np.isnan(v)]
-        for m in ["Naiv", "Holt-Winters", "ARIMA", "XGBoost"]
+        for m in model_keys
     ]
-    ax.boxplot(
+    bp = ax.boxplot(
         data,
-        labels=["Naiv", "Holt-Winters", "ARIMA", "XGBoost"],
+        labels=model_labels,
         patch_artist=True,
-        boxprops=dict(facecolor="#d9eaf7"),
         medianprops=dict(color="darkblue", linewidth=2)
     )
+    box_colors = ["#dddddd", "#5b9bd5", "#9dc3e6", "#ed7d31", "#70ad47"]
+    for patch, color in zip(bp["boxes"], box_colors):
+        patch.set_facecolor(color)
     ax.set_title("Figur 2: Fordeling av MAPE per modell (alle SKU-er)", fontsize=13)
     ax.set_ylabel("MAPE (%)")
     plt.tight_layout()
@@ -627,6 +699,9 @@ if __name__ == "__main__":
     # Kjør alle modeller
     results = run_analysis(df, xgb_model, eda_df)
 
+    # XGBoost individuell per SKU (kontrolleksperiment for pooling-effekten)
+    results["XGBoost (individuell)"] = run_xgboost_individual(df, best_params=best_params)
+
     # Oppsummering
     print("\n" + "=" * 60)
     print("RESULTATER — Median over alle SKU-er")
@@ -654,8 +729,9 @@ if __name__ == "__main__":
     print("  eda_resultater.csv              — ADF, Fs, CV, HW-form per SKU")
     print("  eda_acf_lag_analyse.csv         — ACF-begrunnelse for lagg-valg")
     print("  xgboost_hyperparameter_cv.csv   — Krysskalibrering av hyperparametre")
-    print("  resultater_sammenligning.csv    — Hovedresultater (Tabell 2)")
-    print("  resultater_segment_sesong.csv   — Segmentresultater etter sesong (Tabell 3)")
+    print("  resultater_sammenligning.csv              — Hovedresultater (Tabell 2)")
+    print("  resultater_xgboost_individuell.csv        — Per-SKU resultater for XGBoost individuell")
+    print("  resultater_segment_sesong.csv             — Segmentresultater etter sesong (Tabell 3)")
     print("  resultater_segment_volum.csv    — Segmentresultater etter volum (Tabell 4)")
     print("  figur1_eksempel_prognose.png")
     print("  figur2_mape_boxplot.png")

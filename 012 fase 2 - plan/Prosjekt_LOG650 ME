@@ -4,9 +4,9 @@
 
 Etterspørselsprognoser er kritiske for å forebygge legemiddelmangel og overlagring i farmasøytiske forsyningskjeder, men det er begrenset kunnskap om hvilke prognosemodeller som gir best presisjon for paneldatasett med mange SKU-er og kort historikk i en distribusjonslogistisk kontekst. Denne studien sammenligner fire modeller på et anonymisert datasett bestående av 105 farmasøytiske SKU-er over 48 måneder (januar 2022 – desember 2025): naiv sesongprognose, Holt-Winters eksponentiell glatting, ARIMA/SARIMA og XGBoost. Modellene trenes på de første 36 månedene og evalueres på de siste 12 månedene ved hjelp av feilmålene RMSE, MAE og MAPE (median over alle SKU-er).
 
-Resultatene viser at XGBoost gir lavest prognosefeil på alle tre feilmål (MAPE: 51,97 %; RMSE: 757,23; MAE: 654,94), etterfulgt av ARIMA (MAPE: 57,77 %), Holt-Winters (MAPE: 62,49 %) og naiv prognose (MAPE: 67,50 %). Diebold-Mariano-tester viser ingen statistisk signifikant forskjell mellom Holt-Winters og ARIMA (DM = 1,508, p = 0,132) eller mellom XGBoost og ARIMA (DM = −0,820, p = 0,413). Segmentert analyse viser at XGBoost er særlig overlegen for SKU-er uten tydelig sesongmønster og for varelinjer med høyt volum, men presterer svakt på lavvolum-SKU-er (MAPE: 82,33 %), der Holt-Winters og ARIMA er mer robuste. Det bemerkes at XGBoost er trent som én global modell på alle 105 SKU-er, mens Holt-Winters og ARIMA er tilpasset individuelt per varelinje — en asymmetri som begrenser muligheten til å isolere effekten av modellarkitektur fra effekten av økt treningsvolum.
+Resultatene viser at XGBoost global gir lavest samlet prognosefeil (MAPE: 52,19 %; RMSE: 811,24; MAE: 702,95), etterfulgt av ARIMA (MAPE: 57,77 %), Holt-Winters (MAPE: 62,49 %) og naiv prognose (MAPE: 67,50 %). Diebold-Mariano-tester viser ingen statistisk signifikant forskjell mellom Holt-Winters og ARIMA (DM = 1,766, p = 0,078) eller mellom XGBoost og ARIMA (DM = −0,779, p = 0,436). Segmentert analyse viser at XGBoost er klart best for SKU-er uten tydelig sesongmønster (MAPE: 51,50 %) og for varelinjer med høyt volum (MAPE: 49,46 %), men presterer svakest for SKU-er med tydelig sesongmønster (79,13 %), der ARIMA og Holt-Winters er mer robuste. Som kontrolleksperiment ble XGBoost også trent individuelt per SKU med de samme 36 treningsobservasjonene som Holt-Winters og ARIMA; XGBoost individuell oppnår MAPE 62,61 % — nesten identisk med Holt-Winters og klart svakere enn global XGBoost. Dette bekrefter at den globale treningsstrategien (pooling) er den primære årsaken til XGBoosts fordel, ikke gradient boosting-arkitekturen alene.
 
-Studien bidrar med tre funn: (1) XGBoost som global modell gir observert forbedring over klassiske tidsseriemodeller på farmasøytiske distribusjonsdata med begrenset historikk, men DM-testen bekrefter ikke at forskjellen er statistisk signifikant (p = 0,413), (2) modellprestasjonene varierer systematisk mellom volum- og sesongmønstersegmenter, og (3) ingen av de testede modellparene skiller seg signifikant fra hverandre i DM-test — den observerte rangordningen bør tolkes som en indikasjon, ikke en sikker konklusjon. For virksomheter uten avansert analysekapasitet er Holt-Winters et robust alternativ med lav implementeringskostnad.
+Studien bidrar med fire funn: (1) XGBoost som global modell gir observert forbedring over klassiske tidsseriemodeller, men DM-testen bekrefter ikke statistisk signifikant forskjell fra ARIMA (p = 0,436), (2) modellprestasjonene varierer systematisk mellom volum- og sesongmønstersegmenter, (3) ingen av de testede modellparene skiller seg signifikant fra hverandre i DM-test, og (4) et kontrolleksperiment med XGBoost trent individuelt per SKU (MAPE 62,61 %) bekrefter at global pooling — ikke modellarkitekturen — forklarer XGBoosts relative fordel. For virksomheter uten avansert analysekapasitet er Holt-Winters et robust alternativ med lav implementeringskostnad.
 
 **Innhold**
 
@@ -714,12 +714,15 @@ Tabell 2 presenterer medianverdiene for RMSE, MAE og MAPE på tvers av alle 105 
 |--------|------|-----|----------|
 | Naiv (sesongnaiv) | 1131,65 | 914,58 | 67,50 |
 | Holt-Winters | 935,84 | 769,90 | 62,49 |
+| XGBoost (individuell) | 949,67 | 845,80 | 62,61 |
 | ARIMA / SARIMA | 846,20 | 820,01 | 57,77 |
-| XGBoost | 757,23 | 654,94 | 51,97 |
+| XGBoost (global) | 811,24 | 702,95 | 52,19 |
 
-*Figur 2* viser median MAPE per modell og illustrerer den relative forbedringen fra naiv prognose til XGBoost.
+*Merk:* XGBoost (individuell) er trent separat per SKU på de samme 36 treningsobservasjonene som Holt-Winters og ARIMA, og inkluderes som kontrolleksperiment for å isolere pooling-effekten.
 
-![Figur 2: Median MAPE per modell — sammenligning av alle fire prognosemodeller i testperioden](../004 data/figur2_mape_sammenligning.png)
+*Figur 2* viser median MAPE per modell og illustrerer den relative forbedringen fra naiv prognose til XGBoost global, samt plasseringen av XGBoost individuell mellom Holt-Winters og ARIMA.
+
+![Figur 2: Median MAPE per modell — sammenligning av prognosemodeller i testperioden](../004 data/figur2_mape_sammenligning.png)
 
 ## 7.3 Resultater per undergruppe
 
@@ -731,10 +734,10 @@ $F_s \geq 0{,}64$ (jf. avsnitt 6.3).
 
 | Modell | Tydelig sesong | Svak/ingen sesong |
 |--------|---------------|-------------------|
-| Naiv | 70,20 % | 59,95 % |
-| Holt-Winters | 64,26 % | 59,34 % |
-| ARIMA | 63,09 % | 49,50 % |
-| XGBoost | 62,86 % | 39,37 % |
+| Naiv | 71,92 % | 67,49 % |
+| Holt-Winters | 65,82 % | 61,01 % |
+| ARIMA | 69,86 % | 56,52 % |
+| XGBoost (global) | 79,13 % | 51,50 % |
 
 Tabell 4 viser tilsvarende sammenligning fordelt på volumnivå (høy,
 middels, lav), basert på tertilgrenser for gjennomsnittlig månedlig
@@ -744,18 +747,17 @@ etterspørsel i treningssettet (jf. avsnitt 6.3).
 
 | Modell | Høyt volum | Middels volum | Lavt volum |
 |--------|------------|---------------|------------|
-| Naiv | 58,11 % | 68,02 % | 86,07 % |
-| Holt-Winters | 60,85 % | 63,84 % | 62,49 % |
-| ARIMA | 52,21 % | 60,20 % | 61,48 % |
-| XGBoost | 45,52 % | 51,53 % | 82,33 % |
+| Naiv | 58,85 % | 67,50 % | 86,07 % |
+| Holt-Winters | 61,01 % | 63,63 % | 62,49 % |
+| ARIMA | 54,91 % | 57,77 % | 61,48 % |
+| XGBoost (global) | 49,46 % | 53,32 % | 66,61 % |
 
-Et sentralt funn i Tabell 4 er at XGBoost presterer klart svakest på
-lavvolum-SKU-er med en median MAPE på 82,33 % — høyere enn samtlige
-andre modeller i dette segmentet, inkludert den naive referansemodellen
-(86,07 %). Holt-Winters og ARIMA viser derimot relativt stabil prestasjon
-på tvers av volumnivåer. Dette indikerer at XGBoosts globale
-læringstilnærming ikke er tilstrekkelig for produkter med lav og
-uregelmessig etterspørsel, der individuelle modeller er mer robuste.
+Et sentralt funn i Tabell 4 er at XGBoost presterer svakest på
+sesongpregede SKU-er (Tabell 3: MAPE 79,13 %), men er klart best i
+høyvolumsegmentet (MAPE 49,46 %). Holt-Winters og ARIMA viser mer stabil
+prestasjon på tvers av volumnivåer. XGBoosts volumavhengige prestasjon er
+konsistent med at den globale modellen best utnytter pooling-effekten for
+høyvolum-SKU-er med stabilt etterspørselsmønster.
 
 ## 7.4 Statistisk test
 
@@ -766,8 +768,8 @@ med evalueringsdesignet i avsnitt 6.4.
 
 | Sammenligningspar | DM-statistikk | p-verdi | Konklusjon |
 |-------------------|--------------|---------|------------|
-| Holt-Winters vs. ARIMA | 1,508 | 0,132 | Ikke signifikant (p > 0,05) |
-| XGBoost vs. ARIMA | −0,820 | 0,413 | Ikke signifikant (p > 0,05) |
+| Holt-Winters vs. ARIMA | 1,766 | 0,078 | Ikke signifikant (p > 0,05) |
+| XGBoost vs. ARIMA | −0,779 | 0,436 | Ikke signifikant (p > 0,05) |
 
 # 8.0 Diskusjon
 
@@ -782,17 +784,17 @@ Studiens problemstilling er:
 > hvilken grad varierer modellprestasjonene på tvers av
 > produktsegmenter?*
 
-Resultatene viser at XGBoost gir lavest median MAPE på tvers av de 105 varelinjene, med en verdi på 51,97 % mot 57,77 % for ARIMA og 62,49 % for Holt-Winters. XGBoost er overlegen på alle tre feilmål — RMSE (757,23), MAE (654,94) og MAPE (51,97 %) — sammenlignet med samtlige øvrige modeller. Alle fire modeller forbedrer seg konsistent over den naive referanseprognosen, som hadde en median MAPE på 67,50 %.
+Resultatene viser at XGBoost global gir lavest median MAPE på tvers av de 105 varelinjene (52,19 %), etterfulgt av ARIMA (57,77 %), Holt-Winters (62,49 %) og naiv prognose (67,50 %). XGBoost global er overlegen på alle tre feilmål — RMSE (811,24), MAE (702,95) og MAPE (52,19 %). Alle modeller forbedrer seg konsistent over den naive referanseprognosen (67,50 %).
 
-Svaret på problemstillingen er dermed at XGBoost gir høyest prediksjonsnøyaktighet under de betingelsene som er analysert i denne studien. Resultatet bør imidlertid tolkes med forbehold, da XGBoost her er implementert som en global modell som utnytter mønstre på tvers av alle 105 SKU-er, mens Holt-Winters og ARIMA er tilpasset individuelt per varelinje.
+Svaret på problemstillingen er at XGBoost global gir lavest prognosefeil under de betingelsene som er analysert. Et kontrolleksperiment med XGBoost trent individuelt per SKU — med de samme 36 treningsobservasjonene som Holt-Winters og ARIMA — gir MAPE 62,61 %, nesten identisk med Holt-Winters (62,49 %) og klart svakere enn global XGBoost. Dette bekrefter at global pooling er den primære kilden til XGBoosts fordel, ikke gradient boosting-arkitekturen alene. Funnet diskuteres videre i avsnitt 8.3.
 
 De tre underspørsmålene kan oppsummeres som følger:
 
-**RQ1** besvares bekreftende: XGBoost gir lavest prognosefeil på samtlige tre feilmål i testperioden, med median MAPE 51,97 % mot 57,77 % for ARIMA og 62,49 % for Holt-Winters. Alle fire modeller forbedrer seg over den naive referansen (MAPE 67,50 %).
+**RQ1** besvares bekreftende: XGBoost global gir lavest prognosefeil på samtlige tre feilmål — RMSE (811,24), MAE (702,95) og MAPE (52,19 %) — i testperioden, selv om absoluttnivåene er høye. ARIMA (MAPE 57,77 %) og Holt-Winters (MAPE 62,49 %) presterer begge klart bedre enn den naive referansen (MAPE 67,50 %).
 
-**RQ2** besvares bekreftende: Den relative modellprestasjonen varierer tydelig mellom segmenter. XGBoost er klart best for høyvolumsegmentet (MAPE 45,52 %) og for SKU-er uten tydelig sesongmønster (MAPE 39,37 %), men er svakest i lavvolumsegmentet (MAPE 82,33 %) — under den naive referanseprognosen (86,07 %) for dette segmentet. Holt-Winters og ARIMA viser mer stabil prestasjon på tvers av volumnivåer.
+**RQ2** besvares bekreftende: Den relative modellprestasjonen varierer tydelig mellom segmenter. XGBoost er klart best for høyvolumsegmentet (MAPE 49,46 %) og for SKU-er uten tydelig sesongmønster (MAPE 51,50 %), men er svakest for SKU-er med tydelig sesongmønster (MAPE 79,13 %), der ARIMA (69,86 %) og Holt-Winters (65,82 %) er mer robuste.
 
-**RQ3** besvares med forbehold: XGBoost gir en observert forbedring på om lag 10,5 prosentpoeng i MAPE over Holt-Winters, men DM-testen mellom XGBoost og ARIMA viser ingen statistisk signifikant forskjell (DM = −0,820, p = 0,413). Kombinert med at DM-testen mellom Holt-Winters og ARIMA heller ikke er signifikant (p = 0,132), gir de statistiske testene ikke grunnlag for å fastslå at økt modellkompleksitet systematisk omsettes i bedre prognoser på dette datasettet. Den observerte rangordningen bør tolkes som en indikasjon, ikke en sikker konklusjon.
+**RQ3** besvares med forbehold: XGBoost gir en observert forbedring på 10,3 prosentpoeng i MAPE over Holt-Winters, men DM-testen mellom XGBoost og ARIMA viser ingen statistisk signifikant forskjell (DM = −0,779, p = 0,436). DM-testen mellom Holt-Winters og ARIMA er heller ikke signifikant (DM = 1,766, p = 0,078). Den observerte rangordningen bør tolkes som en indikasjon, ikke en sikker konklusjon.
 
 ## 8.2 Sammenligning med litteraturen
 
@@ -808,19 +810,21 @@ Zhu et al. (2021) demonstrerer at maskinlæringsmodeller som kombinerer historis
 
 Hyndman og Athanasopoulos (2021) og Petropoulos et al. (2022) argumenterer for at enkle modeller ofte presterer like godt som komplekse modeller på korte tidsserier. Studiens resultater utfordrer delvis dette synet — XGBoost gir konsistent lavere feilmål — men bekrefter samtidig at forskjellene er relativt moderate, og at Holt-Winters gir akseptabel prognosepresisjon med langt lavere implementeringskompleksitet.
 
-Diebold-Mariano-testen viser ingen statistisk signifikant forskjell mellom Holt-Winters og ARIMA (DM = 1,508, p = 0,132). Dette indikerer at de to klassiske metodene er likeverdige i presisjonsevne på dette datasettet, til tross for at ARIMA gir noe lavere RMSE og MAPE i gjennomsnitt.
+Diebold-Mariano-testen viser ingen statistisk signifikant forskjell mellom Holt-Winters og ARIMA (DM = 1,766, p = 0,078). Dette indikerer at de to klassiske metodene er likeverdige i presisjonsevne på dette datasettet, til tross for at ARIMA gir noe lavere RMSE og MAPE i gjennomsnitt.
 
-DM-testen mellom XGBoost og ARIMA viser heller ingen statistisk signifikant forskjell (DM = −0,820, p = 0,413). Til tross for at XGBoost har en observert MAPE-fordel på 5,8 prosentpoeng over ARIMA, er denne forskjellen altså ikke statistisk etterprøvbar på dette datasettet. Samlet sett gir DM-testene ikke grunnlag for å konkludere med at noen av de tre modellene er systematisk overlegne hverandre utover tilfeldig variasjon — den rangordningen som fremgår av medianverdiene i Tabell 2, bør tolkes som en indikasjon snarere enn en sikker konklusjon.
+DM-testen mellom XGBoost og ARIMA viser heller ingen statistisk signifikant forskjell (DM = −0,779, p = 0,436). Til tross for at XGBoost har en observert MAPE-fordel på 5,6 prosentpoeng over ARIMA, er denne forskjellen ikke statistisk etterprøvbar på dette datasettet. Samlet sett gir DM-testene ikke grunnlag for å konkludere med at noen av de tre modellene er systematisk overlegne hverandre utover tilfeldig variasjon — den rangordningen som fremgår av medianverdiene i Tabell 2, bør tolkes som en indikasjon snarere enn en sikker konklusjon.
 
 ## 8.3 Modellkompleksitet og praktisk nytte
 
 Et sentralt spørsmål i litteraturen er om økt modellkompleksitet gir reell merverdi i operativ planlegging. Resultatene i denne studien viser at XGBoost gir best prognosepresisjon, men forbedringen over Holt-Winters på MAPE er på om lag 10,5 prosentpoeng. Spørsmålet er om denne gevinsten forsvarer den økte implementeringskompleksiteten.
 
-En viktig metodisk presisering er at sammenligningen er asymmetrisk: XGBoost er trent som én global modell på alle 105 SKU-er (totalt 3 780 treningsobservasjoner), mens Holt-Winters og ARIMA er tilpasset individuelt per varelinje (36 observasjoner per modell). Den globale tilnærmingen gjør det mulig for XGBoost å lære mønstre på tvers av produktporteføljen — mønstre som enkeltseriemodellene ikke har tilgang til. Det er dermed ikke mulig å skille om XGBoosts overlegenhet primært skyldes modellarkitekturen (gradient boosting) eller den globale datautnyttelsen. En mer kontrollert sammenligning ville kreve enten at XGBoost trenes individuelt per SKU, eller at Holt-Winters trenes på poolet data — noe som ligger utenfor denne studiens rammer, men som representerer en relevant metodisk avklaring for fremtidig forskning.
+En sentral metodisk presisering er at den globale XGBoost-modellen og de individuelle statistiske modellene opererer på fundamentalt ulike treningsgrunnlag: global XGBoost trenes på 3 780 observasjoner (105 SKU-er × 36 måneder), mens Holt-Winters og ARIMA tilpasses individuelt på 36 observasjoner per modell. For å isolere effekten av modellarkitektur fra effekten av global datautnyttelse ble XGBoost i denne studien også trent individuelt per SKU — 105 separate modeller, hver med de samme 36 treningsobservasjonene som Holt-Winters og ARIMA. Med lagg 1–12 gir dette kun ~24 brukbare treningsrader per modell.
+
+Resultatet er entydig: XGBoost individuell oppnår median MAPE 62,61 %, nesten identisk med Holt-Winters (62,49 %) og klart svakere enn global XGBoost (52,19 %). Gradient boosting-arkitekturen alene forklarer dermed ikke XGBoosts fordel. Det som skiller global XGBoost fra de øvrige metodene, er muligheten til å låne mønstre på tvers av produktporteføljen — den økte datautnyttelsen fra pooling, ikke algoritmen som sådan. Bidraget fra dette kontrolleksperimentet er å demonstrere at global maskinlæring *som pakke* — inkludert den økte datautnyttelsen — gir observert bedre presisjon, og at pooling-effekten er en reell og kvantifiserbar komponent av XGBoosts relative overlegenhet på dette datasettet.
 
 For virksomheter med tilgjengelig datakompetanse og Python-infrastruktur vil XGBoost være et godt valg. For virksomheter med begrensede analytiske ressurser vil Holt-Winters gi tilfredsstillende prognoser med langt lavere krav til vedlikehold og tolkning. Dette er særlig relevant i farmasøytisk distribusjon, hvor leveringspålitelighet og forutsigbarhet veier tyngre enn marginal presisjonsgevinst.
 
-Videre er det verdt å merke seg at ARIMA ikke gir signifikant bedre prognoser enn Holt-Winters (p = 0,132), noe som taler mot den ekstra modelltilpasningskostnaden ARIMA krever i form av parametervalg og stasjonaritetstesting.
+Videre er det verdt å merke seg at ARIMA ikke gir signifikant bedre prognoser enn Holt-Winters (DM = 1,766, p = 0,078), noe som taler mot den ekstra modelltilpasningskostnaden ARIMA krever i form av parametervalg og stasjonaritetstesting.
 
 ## 8.4 Metodiske begrensninger
 
@@ -830,7 +834,7 @@ Studien har flere begrensninger som bør tas i betraktning ved tolkning av resul
 
 **Kort historikk for XGBoost:** Med 36 måneder treningsdata per varelinje er datagrunnlaget relativt begrenset for en maskinlæringsmodell. XGBoost er generelt best egnet for større datasett, og resultatene kan derfor ikke uten videre generaliseres til situasjoner med lengre historikk. Med mer data ville XGBoost potensielt gitt enda større fordel over de klassiske modellene.
 
-**Uavhengige varelinjer:** Holt-Winters og ARIMA er modellert individuelt per varelinje, mens XGBoost er trent som en global modell på alle 105 SKU-er. Denne asymmetrien kan ha gitt XGBoost en fordel, og resultatene bør tolkes i lys av dette metodiske valget.
+**Pooling-effekt kvantifisert:** Holt-Winters og ARIMA er modellert individuelt per varelinje, mens XGBoost er trent som en global modell på alle 105 SKU-er. Et kontrolleksperiment der XGBoost ble trent individuelt per SKU viser MAPE 62,61 % — nesten identisk med Holt-Winters (62,49 %) og klart svakere enn global XGBoost (52,19 %). Asymmetrien er dermed ikke bare en begrensning, men et kvantifisert funn: global pooling er den primære kilden til XGBoosts fordel.
 
 **Ekstern validitet:** Resultatene gjelder ett distribusjonsselskap i én bransje. Overførbarheten til andre bransjer eller distribusjonssystemer er begrenset.
 
@@ -845,13 +849,13 @@ For virksomheter i farmasøytisk distribusjon med tilsvarende datastruktur gir s
 
 # 9.0 Konklusjon
 
-Studien sammenlignet fire prognosemodeller — naiv sesongprognose, Holt-Winters eksponentiell glatting, ARIMA og XGBoost — på et anonymisert datasett med 105 farmasøytiske varelinjer over 48 måneder, med treningssett 2022–2024 og testperiode januar–desember 2025.
+Studien sammenlignet fem prognosemodeller — naiv sesongprognose, Holt-Winters eksponentiell glatting, ARIMA, XGBoost global og XGBoost individuell — på et anonymisert datasett med 105 farmasøytiske varelinjer over 48 måneder, med treningssett 2022–2024 og testperiode januar–desember 2025.
 
-De tre underspørsmålene besvares som følger. **RQ1**: XGBoost gir lavest prognosefeil på samtlige tre feilmål — RMSE (757,23), MAE (654,94) og MAPE (51,97 %) — og er den beste modellen i testperioden. ARIMA (MAPE 57,77 %) og Holt-Winters (MAPE 62,49 %) presterer begge klart bedre enn den naive referansen (MAPE 67,50 %). **RQ2**: Modellprestasjonene varierer tydelig mellom segmenter. XGBoost er særlig overlegen for høyvolumsegmentet (MAPE 45,52 %) og for SKU-er uten tydelig sesongmønster (MAPE 39,37 %), men er svakest for lavvolum-SKU-er (MAPE 82,33 %), der Holt-Winters og ARIMA er mer robuste. **RQ3**: Økt modellkompleksitet gir en forbedring på om lag 10,5 prosentpoeng i MAPE (XGBoost vs. Holt-Winters), men DM-testen viser ingen signifikant forskjell mellom Holt-Winters og ARIMA (DM = 1,508, p = 0,132), noe som indikerer at økt statistisk kompleksitet ikke alltid omsettes i bedre prognoser på dette datasettet.
+De tre underspørsmålene besvares som følger. **RQ1**: XGBoost global gir lavest prognosefeil på samtlige tre feilmål — RMSE (811,24), MAE (702,95) og MAPE (52,19 %) — og rangerer høyest blant de testede modellene. ARIMA (MAPE 57,77 %) og Holt-Winters (MAPE 62,49 %) presterer begge klart bedre enn den naive referansen (MAPE 67,50 %). **RQ2**: Modellprestasjonene varierer tydelig mellom segmenter. XGBoost global er klart best for høyvolumsegmentet (MAPE 49,46 %) og for SKU-er uten tydelig sesongmønster (MAPE 51,50 %), men er svakest for SKU-er med tydelig sesongmønster (MAPE 79,13 %), der ARIMA (69,86 %) og Holt-Winters (65,82 %) er mer robuste. **RQ3**: DM-testen mellom Holt-Winters og ARIMA er ikke signifikant (DM = 1,766, p = 0,078), og XGBoost skiller seg heller ikke signifikant fra ARIMA (DM = −0,779, p = 0,436). Den observerte rangordningen bør tolkes som en indikasjon, ikke en sikker konklusjon.
 
-Disse funnene bør tolkes med én sentral metodisk presisering: XGBoost er trent som én global modell på alle 105 SKU-er, mens Holt-Winters og ARIMA er tilpasset individuelt per varelinje. XGBoosts fordel kan dermed skyldes global datautnyttelse like mye som modellarkitektur, og dette skillet bør undersøkes nærmere i fremtidig forskning med et mer kontrollert design.
+Et kontrolleksperiment med XGBoost trent individuelt per SKU (MAPE 62,61 %) — med de samme 36 treningsobservasjonene som Holt-Winters og ARIMA — bekrefter at global pooling er den primære årsaken til XGBoosts fordel, ikke gradient boosting-arkitekturen alene. Med individuell trening presterer XGBoost omtrent på nivå med Holt-Winters.
 
-Studiens faglige bidrag er tredelt: (1) den viser at XGBoost som global modell gir målbar forbedring over klassiske tidsseriemodeller på et reelt farmasøytisk distribusjonsdatasett med begrenset historikk, (2) den dokumenterer at modellprestasjonene varierer systematisk mellom produkt- og volumsegmenter — et forhold litteraturen ofte ikke rapporterer eksplisitt — og (3) den bekrefter ved DM-test at det ikke er statistisk grunnlag for å foretrekke ARIMA over Holt-Winters i dette distribusjonsleddet. For praktikere i farmasøytisk distribusjon er konklusjonen at Holt-Winters er et robust alternativ med lav implementeringskostnad, og at XGBoost gir reell merverdi primært for virksomheter med datakompetanse og høyvolum-produktporteføljer.
+Studiens faglige bidrag er firedelt: (1) den viser at XGBoost som global modell gir observert forbedring over klassiske tidsseriemodeller, men DM-testen bekrefter ikke statistisk signifikant overlegenhet over ARIMA (p = 0,436), (2) den dokumenterer at modellprestasjonene varierer systematisk mellom segmenter — XGBoost er sterkest for høyvolum og ikke-sesongpregede SKU-er, mens ARIMA og Holt-Winters er mer robuste for sesongpregede produkter — (3) den bekrefter ved DM-test at ingen av de testede modellparene skiller seg signifikant fra hverandre, og (4) kontrolleksperimentet med individuell XGBoost isolerer pooling-effekten og viser at global datautnyttelse — ikke modellarkitekturen — forklarer XGBoosts relative fordel. For praktikere i farmasøytisk distribusjon er konklusjonen at Holt-Winters er et robust alternativ med lav implementeringskostnad, og at XGBoost gir reell merverdi primært for virksomheter med datakompetanse og høyvolum-produktporteføljer som kan utnytte global pooling.
 
 ## 9.1 Videre forskning
 
@@ -861,7 +865,7 @@ Denne studien reiser flere spørsmål som kan være utgangspunkt for videre fors
 - **Hierarkisk prognosering:** Fremtidige studier kan undersøke om prognoser på aggregert nivå (f.eks. terapeutisk kategori) gir bedre presisjon enn prognoser per varelinje.
 - **Hybrid-modeller:** Kombinasjoner av klassiske og maskinlæringsbaserte metoder er et voksende forskningsfelt som kan gi bedre resultater enn enkeltstående modeller.
 - **Eksogene variabler:** Inkludering av eksterne faktorer som sesonginfluensa, legemiddelmangel eller regulatoriske endringer kan forbedre prognosenøyaktigheten for utvalgte produktkategorier.
-- **Global versus individuell XGBoost:** En kontrollert sammenligning der XGBoost trenes per SKU (individuelt) mot en global modell ville gjøre det mulig å isolere effekten av modellarkitektur fra effekten av økt treningsvolum — en metodisk avklaring denne studien ikke kan gi.
+- **Global versus individuell pooling for andre modeller:** Kontrolleksperimentet i denne studien bekrefter at global pooling er den primære årsaken til XGBoosts fordel. Et naturlig neste steg er å undersøke om globale varianter av Holt-Winters eller ARIMA (f.eks. hierarkisk prognosering eller vektorautoregresjon) gir tilsvarende gevinst — dette ville gjøre det mulig å sammenligne modellarkitekturer direkte uten confounding fra ulik treningsdatamengde.
 
 # 10.0 Bibliografi
 
@@ -937,8 +941,9 @@ kapittel 8.2.
 |--------|--------------|-------------|-----------------|--------|
 | Naiv (sesongnaiv) | 1131,65 | 914,58 | 67,50 | 105 |
 | Holt-Winters | 935,84 | 769,90 | 62,49 | 105 |
+| XGBoost (individuell) | 949,67 | 845,80 | 62,61 | 105 |
 | ARIMA / SARIMA | 846,20 | 820,01 | 57,77 | 105 |
-| XGBoost | 757,23 | 654,94 | 51,97 | 105 |
+| XGBoost (global) | 811,24 | 702,95 | 52,19 | 105 |
 
 Kilde: `resultater_sammenligning.csv` generert av `analyse.py`.
 
