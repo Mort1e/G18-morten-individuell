@@ -673,6 +673,49 @@ def plot_example_forecasts(df, output_dir, xgb_model, eda_df):
     print(f"  Lagret: figur1_eksempel_prognose.png")
 
 
+# ── 11. Lagre tilleggsdata for figurer_nye.py ─────────────────────────────────
+def save_sku_mape_all_models(results, sku_list, output_dir):
+    """Lagre per-SKU MAPE for alle modeller — brukes av figurer_nye.py."""
+    records = []
+    for i, sku in enumerate(sku_list):
+        row = {"SKU": sku}
+        for model_name in ["Naiv", "Holt-Winters", "ARIMA", "XGBoost"]:
+            mape_list = results.get(model_name, {}).get("MAPE", [])
+            row[model_name] = mape_list[i] if i < len(mape_list) else np.nan
+        ind_mape = results.get("XGBoost (individuell)", {}).get("MAPE", [])
+        row["XGBoost_ind"] = ind_mape[i] if i < len(ind_mape) else np.nan
+        records.append(row)
+    df_out = pd.DataFrame(records)
+    df_out.to_csv(f"{output_dir}/resultater_sku_mape.csv", index=False)
+    print(f"  Lagret: resultater_sku_mape.csv")
+    return df_out
+
+
+def save_monthly_errors(results, output_dir):
+    """Lagre månedlig median MAPE per modell — brukes av figurer_nye.py."""
+    month_names = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+                   "Jul", "Aug", "Sep", "Okt", "Nov", "Des"]
+    ref_actuals = np.array(results["Naiv"]["actuals"])
+    records = []
+    for m in range(TEST_PERIODS):
+        row = {"Maaned": month_names[m], "Maaned_nr": m + 1}
+        m_actuals = ref_actuals[m::TEST_PERIODS]
+        for model_name in ["Naiv", "Holt-Winters", "ARIMA", "XGBoost"]:
+            preds = np.array(results[model_name]["preds"])
+            m_preds = preds[m::TEST_PERIODS]
+            mask = m_actuals != 0
+            if mask.sum() > 0:
+                ape = np.abs((m_actuals[mask] - m_preds[mask]) / m_actuals[mask]) * 100
+                row[f"{model_name}_MAPE"] = round(float(np.median(ape)), 2)
+            else:
+                row[f"{model_name}_MAPE"] = np.nan
+        records.append(row)
+    df_out = pd.DataFrame(records)
+    df_out.to_csv(f"{output_dir}/resultater_maaned.csv", index=False)
+    print(f"  Lagret: resultater_maaned.csv")
+    return df_out
+
+
 # ── Hovedprogram ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     print("=" * 60)
@@ -701,6 +744,11 @@ if __name__ == "__main__":
 
     # XGBoost individuell per SKU (kontrolleksperiment for pooling-effekten)
     results["XGBoost (individuell)"] = run_xgboost_individual(df, best_params=best_params)
+
+    # Tilleggsdata for figurer_nye.py
+    print("\nLagrer tilleggsdata for figurer_nye.py...")
+    save_sku_mape_all_models(results, list(df.index), OUTPUT_DIR)
+    save_monthly_errors(results, OUTPUT_DIR)
 
     # Oppsummering
     print("\n" + "=" * 60)
@@ -733,6 +781,9 @@ if __name__ == "__main__":
     print("  resultater_xgboost_individuell.csv        — Per-SKU resultater for XGBoost individuell")
     print("  resultater_segment_sesong.csv             — Segmentresultater etter sesong (Tabell 3)")
     print("  resultater_segment_volum.csv    — Segmentresultater etter volum (Tabell 4)")
+    print("  resultater_sku_mape.csv         — Per-SKU MAPE for alle modeller (figurer_nye.py)")
+    print("  resultater_maaned.csv           — Månedlig median MAPE per modell (figurer_nye.py)")
     print("  figur1_eksempel_prognose.png")
     print("  figur2_mape_boxplot.png")
+    print("  Kjør figurer_nye.py separat for figur3–figur6.")
     print("=" * 60)

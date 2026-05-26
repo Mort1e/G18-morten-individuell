@@ -935,6 +935,15 @@ alt="Figur 2: Median MAPE per modell — sammenligning av prognosemodeller i tes
 <figcaption aria-hidden="true">Figur 2: Median MAPE per modell —
 sammenligning av prognosemodeller i testperioden</figcaption>
 </figure>
+<p><em>Figur 4</em> supplerer Figur 2 ved å vise den fullstendige fordelingen av MAPE for
+alle 105 SKU-er per modell. Der Figur 2 kun viser medianverdiene, avdekker boksplottet
+spredning og halebredde — og illustrerer dermed visuelt hvorfor median benyttes fremfor
+gjennomsnitt som aggregeringsmål (jf. avsnitt 4.3, Forutsetning 5).</p>
+<figure>
+<img src="004%20data/figur4_mape_boxplot.png"
+alt="Figur 4: Fordeling av MAPE per modell — alle 105 SKU-er, testperiode Jan–Des 2025" />
+<figcaption aria-hidden="true">Figur 4: Fordeling av MAPE per modell — alle 105 SKU-er (testperiode Jan–Des 2025)</figcaption>
+</figure>
 <h2 id="resultater-per-undergruppe">7.3 Resultater per undergruppe</h2>
 <p>Tabell 3 viser median MAPE fordelt på varelinjer med henholdsvis
 tydelig og svakt sesongmønster, klassifisert ved STL-basert sesongstyrke
@@ -1019,6 +1028,26 @@ og Holt-Winters (62,49 %) i dette segmentet. Holt-Winters og ARIMA viser derimot
 relativt stabil prestasjon på tvers av volumnivåer. For høyvolumsegmentet oppnår
 XGBoost best MAPE (49,46 %), noe som bekrefter at den globale modellen
 særlig drar nytte av økt datamengde ved høyere volum.</p>
+<p><em>Figur 3</em> visualiserer mønstrene i Tabell 3 og 4 som grupperte søylediagram.
+Panel A viser at XGBoost er klart best for varelinjer uten tydelig sesongmønster
+(MAPE 51,5 %), men svakest for sesongpregede produkter (79,1 %) — der Holt-Winters og
+ARIMA er mer robuste. Panel B viser at XGBoost er best i høyvolumsegmentet (49,5 %),
+mens Holt-Winters er mest stabil på tvers av volumnivåer.</p>
+<figure>
+<img src="004%20data/figur3_segment_bars.png"
+alt="Figur 3: Median MAPE per modell — segmentert analyse, testperiode Jan–Des 2025" />
+<figcaption aria-hidden="true">Figur 3: Median MAPE per modell — segmentert analyse (testperiode Jan–Des 2025)</figcaption>
+</figure>
+<p><em>Figur 5</em> viser median MAPE per måned gjennom testperioden januar–desember 2025.
+Figuren avdekker om prognosefeil varierer systematisk over tid, og tilfører en tidsdimensjon
+til de samlede resultatene i Tabell 2. Et fremtredende mønster er den markante økningen i
+prognosefeil for samtlige modeller i november og desember — en periode preget av
+etterspørselssvingninger knyttet til sesongavslutning og juledistribusjon.</p>
+<figure>
+<img src="004%20data/figur5_maaned_mape.png"
+alt="Figur 5: Månedlig median MAPE per modell — testperiode Jan–Des 2025" />
+<figcaption aria-hidden="true">Figur 5: Månedlig median MAPE per modell — testperiode Jan–Des 2025</figcaption>
+</figure>
 <h2 id="statistisk-test">7.4 Statistisk test</h2>
 <p>Diebold-Mariano-tester er gjennomført for to sammenligningspar i tråd
 med evalueringsdesignet i avsnitt 6.4.</p>
