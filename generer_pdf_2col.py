@@ -1,7 +1,7 @@
 """
-generer_pdf.py
-Genererer PDF av rapport_live.html via Chrome headless — to-kolonne akademisk layout.
-Kjør: python generer_pdf.py
+generer_pdf_2col.py
+Genererer en to-kolonne preview-PDF av rapport_live.html.
+Kjør: python generer_pdf_2col.py
 """
 
 import os
@@ -12,32 +12,23 @@ import time
 import http.server
 import socketserver
 
-# --- Konfigurasjon ---
 KILDE_HTML = "rapport_live.html"
-OUTPUT_PDF  = r"005 report\Prosjekt_LOG650_ME_Morten_Eidsvag.pdf"
-TEMP_HTML   = "rapport_print_temp.html"
-PORT        = 8766
+OUTPUT_PDF  = r"005 report\Prosjekt_LOG650_ME_2kol_forslag.pdf"
+TEMP_HTML   = "rapport_print_2col_temp.html"
+PORT        = 8767
 CHROME      = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 
-# --- Lag print-versjon av HTML ---
 with open(KILDE_HTML, "r", encoding="utf-8") as f:
     html = f.read()
 
 # Fjern auto-refresh
 html = re.sub(r'<meta http-equiv="refresh"[^>]*>\s*', "", html)
 
-print_css = """
+two_col_css = """
 <style>
-/* ════════════════════════════════════════════
-   To-kolonne akademisk layout — LOG650
-   ════════════════════════════════════════════ */
+/* ── To-kolonne akademisk layout ── */
+@page { size: A4; margin: 2cm 1.5cm; }
 
-@page {
-  size: A4;
-  margin: 2cm 1.5cm 2.2cm 1.5cm;
-}
-
-/* ── Grunnleggende typografi ── */
 body {
   font-family: "Times New Roman", Times, serif;
   font-size: 9.5pt;
@@ -45,196 +36,142 @@ body {
   color: #000;
   background: white !important;
   padding: 0 !important;
-  margin: 0 !important;
 }
 
-/* ── Hoved-container: to kolonner ── */
 .container {
   max-width: 100% !important;
   padding: 0 !important;
   box-shadow: none !important;
   column-count: 2;
-  column-gap: 1.1cm;
+  column-gap: 1.2cm;
   column-rule: 0.3pt solid #ccc;
 }
 
-/* ── Elementer som strekker seg over begge kolonner ── */
+/* Elementer som skal strekke seg over begge kolonner */
 .abstract,
-.toc,
-figure,
-table {
+.toc {
   column-span: all;
 }
 
-/* ── Abstract ── */
+figure {
+  column-span: all;
+  margin: 1em 0;
+}
+
+/* Abstract */
 .abstract {
   border-top: 1.5pt solid #000;
   border-bottom: 0.5pt solid #000;
-  padding: 0.8rem 0;
-  margin-bottom: 1.1rem;
+  padding: 0.75rem 0;
+  margin-bottom: 1rem;
 }
 .abstract p {
   font-size: 9pt;
-  line-height: 1.45;
+  line-height: 1.4;
   margin: 0.3rem 0;
-  text-align: justify;
-  hyphens: auto;
 }
 .abstract p:first-child {
   font-size: 9pt;
   font-weight: bold;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  margin-bottom: 0.5rem;
-  text-align: left;
 }
 
-/* ── Innholdsfortegnelse ── */
+/* TOC */
 .toc {
   border: 0.5pt solid #ccc;
-  padding: 0.6rem 1rem;
+  padding: 0.5rem 1rem;
   margin-bottom: 1.2rem;
   background: #fafafa;
 }
 .toc p {
   font-size: 9pt;
-  line-height: 1.8;
+  line-height: 1.7;
   margin: 0;
   text-align: left;
 }
 .toc p:first-child {
   font-weight: bold;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin-bottom: 0.35rem;
 }
 
-/* ── Overskrifter ── */
+/* Overskrifter */
 h1 {
   font-size: 11pt;
   font-weight: bold;
   margin-top: 1.4rem;
-  margin-bottom: 0.35rem;
-  break-after: avoid;
+  margin-bottom: 0.3rem;
+  break-before: auto;
 }
 h2 {
   font-size: 10pt;
   font-weight: bold;
-  margin-top: 1rem;
+  margin-top: 0.9rem;
   margin-bottom: 0.15rem;
-  break-after: avoid;
 }
 h3 {
   font-size: 9.5pt;
   font-weight: bold;
   font-style: italic;
-  margin-top: 0.8rem;
-  margin-bottom: 0.1rem;
-  break-after: avoid;
+  margin-top: 0.7rem;
 }
 
-/* ── Brødtekst ── */
+/* Tekst */
 p {
   text-align: justify;
   hyphens: auto;
   -webkit-hyphens: auto;
-  margin: 0.4rem 0;
+  margin: 0.35rem 0;
   orphans: 3;
   widows: 3;
 }
 
-/* ── Tabeller (strekker seg over begge kolonner) ── */
+/* Tabeller */
 table {
   border-collapse: collapse;
   width: 100%;
-  margin: 1rem 0;
+  margin: 0.8rem 0;
   font-size: 8.5pt;
   border-top: 1.5pt solid #000;
   border-bottom: 1.5pt solid #000;
-  break-inside: avoid;
 }
 th, td {
   border: none;
-  padding: 0.3rem 0.6rem;
+  padding: 0.3rem 0.5rem;
   text-align: left;
 }
 th {
   font-weight: bold;
   border-bottom: 0.5pt solid #000;
 }
-tr:nth-child(even) { background: none; }
 
-/* ── Figurer (strekker seg over begge kolonner) ── */
-figure {
-  margin: 1.2em 0;
-  break-inside: avoid;
-}
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
+/* Figurtekst */
 figcaption {
   font-size: 8.5pt;
   text-align: center;
-  font-style: normal;
-  margin-top: 0.4rem;
+  margin-top: 0.3rem;
   color: #000;
 }
 
-/* ── Matematiske formler (innenfor kolonnen, skalert ned) ── */
-mjx-container[display="true"] {
-  font-size: 78% !important;
-  margin: 0.5rem 0;
-  max-width: 100%;
-  overflow-x: hidden;
-  display: block;
-}
-mjx-container[display="true"] > svg,
-mjx-container[display="true"] > mjx-math {
-  max-width: 100%;
-}
-mjx-container:not([display="true"]) {
-  font-size: 90% !important;
-}
-.math.display {
-  font-size: 78%;
-  margin: 0.5rem 0;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-/* ── Sitatbokser (forskningsspørsmål) ── */
+/* Sitatbokser (RQ) */
 blockquote {
   border: 0.5pt solid #bbb;
   background: #f5f5f5;
-  margin: 0.8rem 0;
-  padding: 0.5rem 0.85rem;
+  margin: 0.7rem 0;
+  padding: 0.45rem 0.8rem;
   font-size: 9pt;
-  break-inside: avoid;
 }
 
-/* ── Kode ── */
+/* Kode */
 code {
   font-family: "Courier New", monospace;
   font-size: 8.5pt;
   background: #f0f0f0;
   padding: 0 3px;
-  border-radius: 2px;
 }
 
-/* ── Lister ── */
-ul, ol {
-  margin: 0.4rem 0 0.4rem 1.2rem;
-  padding: 0;
-}
-li {
-  margin: 0.15rem 0;
-  font-size: 9.5pt;
-}
-
-/* ── Fjern live-indikator ── */
+/* Fjern live-indikator */
 body::after { display: none !important; }
 </style>
 
@@ -250,12 +187,12 @@ body::after { display: none !important; }
 </script>
 """
 
-html = html.replace("</head>", print_css + "</head>")
+html = html.replace("</head>", two_col_css + "</head>")
 
 with open(TEMP_HTML, "w", encoding="utf-8") as f:
     f.write(html)
 
-# --- Start lokal HTTP-server ---
+# Start lokal HTTP-server
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *args):
         pass
@@ -274,7 +211,7 @@ for _ in range(20):
         time.sleep(0.3)
 
 print(f"Server klar på http://localhost:{PORT}")
-print(f"Genererer PDF: {OUTPUT_PDF}")
+print(f"Genererer to-kolonne PDF: {OUTPUT_PDF}")
 
 abs_output = os.path.abspath(OUTPUT_PDF)
 url = f"http://localhost:{PORT}/{TEMP_HTML}"
@@ -285,15 +222,13 @@ result = subprocess.run([
     "--disable-gpu",
     "--no-pdf-header-footer",
     "--print-to-pdf=" + abs_output,
-    "--virtual-time-budget=12000",
+    "--virtual-time-budget=10000",
     url,
 ], capture_output=True, text=True, timeout=60)
 
-# --- Rydd opp ---
 httpd.shutdown()
 os.remove(TEMP_HTML)
 
-# --- Resultat ---
 if result.returncode == 0 and os.path.exists(abs_output):
     size_kb = os.path.getsize(abs_output) // 1024
     print(f"PDF generert: {abs_output} ({size_kb} KB)")
