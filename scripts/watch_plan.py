@@ -13,6 +13,8 @@ import socketserver
 import webbrowser
 import socket
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 PORT = 8765
 
 FILES = [
@@ -34,8 +36,8 @@ def pandoc_cmd(watch_file, output_html, title):
         "-o", output_html,
         "--standalone",
         "--metadata", f"title={title}",
-        "--css", "plan_style.css",
-        "--template", "plan_template.html",
+        "--css", "scripts/plan_style.css",
+        "--template", os.path.join(SCRIPT_DIR, "plan_template.html"),
         "--mathjax",
     ]
 
