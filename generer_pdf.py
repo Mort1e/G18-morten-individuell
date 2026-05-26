@@ -61,9 +61,15 @@ body {
 /* ── Elementer som strekker seg over begge kolonner ── */
 .abstract,
 .toc,
-figure,
-table {
+figure {
   column-span: all;
+}
+
+/* Tabeller flyter innenfor kolonnen */
+table {
+  column-span: none;
+  width: 100%;
+  font-size: 7.5pt;
 }
 
 /* ── Tittelseksjon ── */
