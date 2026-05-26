@@ -1,11 +1,11 @@
-# Prosjektstyringsplan [Versjon 3.1]{.mark}
+# Prosjektstyringsplan [Endelig versjon]{.mark}
 
 **Analyserer av historiske salgsdata for å utvikle en modell for
 månedlig etterspørselsprognose.**
 
 Emne: LOG650 -- Forskningsprosjekt: Logistikk og kunstig intelligens
 
-Dato: 16.04.2026
+Dato: 26.05.2026
 
 Utarbeidet av: Morten Eidsvåg
 
@@ -42,6 +42,14 @@ Bedrift: Importør av legemidler
                          faktiske utfall; suksess-
                          kriteriene merket med status;
                          1.3 Kunde rettet til 1.4
+
+  Endelig   2026-05-26   WBS fase 4 fullstendig          —
+  versjon                oppdatert; milepælsstatus
+                         satt til fullført for alle
+                         leveranser unntatt innlevering;
+                         presentasjon gjennomført;
+                         rapport og referanser
+                         kvalitetssikret
   -----------------------------------------------------------------------
 
 1 Sammendrag
@@ -365,13 +373,13 @@ analyse og diskusjon av praktiske implikasjoner for logistikkplanlegging.
 
 **Fase 4**
 
-- [ ] 4\. Avslutning
+- [x] 4\. Avslutning
 
-  - [ ] 4.1 Revidere rapport etter tilbakemeldinger
-  - [ ] 4.2 Ferdigstille analyse og figurer
-  - [ ] 4.3 Kvalitetssikre referanser og metode
-  - [ ] 4.4 Ferdigstille sluttrapport
-  - [ ] 4.5 Utarbeide presentasjon
+  - [x] 4.1 Revidere rapport etter tilbakemeldinger
+  - [x] 4.2 Ferdigstille analyse og figurer
+  - [x] 4.3 Kvalitetssikre referanser og metode
+  - [x] 4.4 Ferdigstille sluttrapport
+  - [x] 4.5 Utarbeide presentasjon
   - [ ] 4.6 Endelig innlevering
 
 3.0 Fremdrift
@@ -412,8 +420,16 @@ Fase 4: avslutning i mai 2026
   Peer review        Fagfellevurdering mottatt og     2026-04-29   Oppnådd
   gjennomført        vurdert
 
-  Endelig rapport    Endelig versjon av rapport       2026-05-31   Planlagt
-  ferdigstilt        ferdig etter revisjon
+  Rapport            Rapport revidert etter peer      2026-05-26   Oppnådd
+  kvalitetssikret    review; referanser kontrollert;
+                     språk og formuleringer
+                     gjennomgått
+
+  Presentasjon       PowerPoint-presentasjon for      2026-05-26   Oppnådd
+  ferdigstilt        muntlig eksamen utarbeidet
+
+  Endelig            Endelig versjon av rapport og    2026-05-31   Planlagt
+  innlevering        prosjektstyringsplan levert
   ---------------------------------------------------------------------------
 
 3.1.1 Gantt-plan
