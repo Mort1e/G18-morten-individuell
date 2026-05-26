@@ -66,6 +66,40 @@ table {
   column-span: all;
 }
 
+/* ── Tittelseksjon ── */
+.title-section {
+  column-span: all;
+  text-align: center;
+  padding: 1.2rem 0 1rem 0;
+  margin-bottom: 0.8rem;
+}
+.paper-title {
+  font-size: 15pt;
+  font-weight: bold;
+  line-height: 1.3;
+  margin: 0 0 0.6rem 0;
+  text-align: center;
+}
+.paper-subtitle {
+  font-size: 10.5pt;
+  font-style: italic;
+  margin: 0 0 0.9rem 0;
+  line-height: 1.4;
+  text-align: center;
+}
+.paper-author {
+  font-size: 11pt;
+  font-weight: bold;
+  margin: 0 0 0.25rem 0;
+  text-align: center;
+}
+.paper-meta {
+  font-size: 9pt;
+  color: #333;
+  margin: 0;
+  text-align: center;
+}
+
 /* ── Abstract ── */
 .abstract {
   border-top: 1.5pt solid #000;
@@ -79,14 +113,6 @@ table {
   margin: 0.3rem 0;
   text-align: justify;
   hyphens: auto;
-}
-.abstract p:first-child {
-  font-size: 9pt;
-  font-weight: bold;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
-  text-align: left;
 }
 
 /* ── Innholdsfortegnelse ── */
